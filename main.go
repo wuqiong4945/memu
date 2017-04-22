@@ -37,7 +37,7 @@ func main() {
 	fmt.Printf("took amount of time: %s\n", time.Now().Sub(t).String())
 	// mame.Fresh()
 	mame.Update()
-	// mame.Audit()
+	mame.Audit()
 
 	fmt.Println("current mame version is : " + mame.Build)
 	// fmt.Printf("%#v\n", mame.Machine("qsound"))
@@ -52,19 +52,17 @@ func main() {
 	// info := GetInfo("aoh", "history")
 	// fmt.Println(info)
 	// exec.Command("firefox", info).Output()
+	var info string
+	for _, machine := range mame.Machines {
+		if machine.MachineStatus != MACHINE_NEXIST {
+			info += machine.Status()
+		}
+	}
+	html, _ := os.OpenFile("info.html", os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+	defer html.Close()
+	html.WriteString(info)
 
 	fmt.Printf("Start memu took amount of time: %s\n", time.Now().Sub(t).String())
-
-	//	cmd := exec.Command("gedit") // this opens a gedit-window
-	//	err := cmd.Run()
-	//	if err != nil {
-	//		fmt.Printf("Error %v executing command!", err)
-	//		os.Exit(1)
-	//	}
-	//	fmt.Printf("The command is %v", cmd)
-	//	pwdCmd := exec.Command("pwd")
-	//	pwdOutput, _ := pwdCmd.Output()
-	//	fmt.Println(string(pwdOutput))
 }
 
 func CheckError(err error) {

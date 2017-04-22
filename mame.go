@@ -144,15 +144,25 @@ func (mame *Mame) Audit() {
 	t := time.Now()
 	defer fmt.Printf("Audit time: %s\n", time.Now().Sub(t).String())
 
+	// reset status
+	for k, _ := range mame.Machines {
+		mame.Machines[k].MachineStatus = MACHINE_NEXIST
+		for m, _ := range mame.Machines[k].Roms {
+			mame.Machines[k].Roms[m].RomStatus = ROM_NEXIST
+		}
+		for m, _ := range mame.Machines[k].Disks {
+			mame.Machines[k].Disks[m].DiskStatus = DISK_NEXIST
+		}
+	}
+
 	romDirs := "roms"
 	//fullPath, _ := filepath.Abs(path)
-
 	// idleFiles := []string{}
 	dirs := strings.Split(romDirs, ";")
 	for _, dir := range dirs {
 		list, err := ioutil.ReadDir(dir)
 		CheckError(err)
-		fmt.Println("\n===== " + dir + "是目录 =====")
+		fmt.Println("\n===== " + dir + " =====")
 
 		// Iterate through the files in the directory
 		for _, info := range list {
@@ -160,101 +170,191 @@ func (mame *Mame) Audit() {
 			// dispose machine in chd file
 			case info.IsDir() == true:
 				// just chd game has sub dir
-				fmt.Println("\n--- " + info.Name() + "是目录 ---")
-				CHDMachineName := info.Name()
-				CHDDirectory := dir + "/" + CHDMachineName
-				machine := mame.Machine(CHDMachineName)
-				if machine == nil {
-					fmt.Println(CHDDirectory + " is not a vaild directory.")
-					continue
-				}
-
-				// Iterate through the files in the sub directory, only for chd machine
-				sublist, err := ioutil.ReadDir(CHDDirectory)
-				CheckError(err)
-				for _, subinfo := range sublist {
-					CHDFileName := subinfo.Name()
-					CHDFilePath := CHDDirectory + "/" + CHDFileName
-					if !strings.HasSuffix(CHDFileName, ".chd") {
-						fmt.Println(CHDFilePath + " is not a CHD file.")
-						// idleFiles = append(idleFiles, directoryPath)
-						continue
-					}
-					// check sha1 of chd file
-					data, err := ioutil.ReadFile(CHDFilePath)
-					CheckError(err)
-					sha1 := fmt.Sprintf("%x", sha1.Sum(data))
-					disk := machine.Disk(sha1)
-					if disk == nil {
-						continue
-					}
-
-					fmt.Println(disk.Name)
-					fmt.Println(sha1)
-					// this.addMachine(machine)
-					// machineStatus = this.MachineStatus[directoryName]
-				}
+				mame.AuditCHDFolder(dir, info.Name())
 
 			case strings.HasSuffix(info.Name(), ".zip"):
-				machineName := strings.TrimSuffix(info.Name(), ".zip")
-				machineFilePath := dir + "/" + info.Name()
-				machine := mame.Machine(machineName)
-				CheckError(err)
-				if machine == nil {
-					continue
-				}
-				fmt.Println("\n--- " + machine.Name + ".zip ---")
-				// Open a zip archive for reading.
-				z, err := zip.OpenReader(machineFilePath)
-				CheckError(err)
+				mame.AuditZipFile(dir, info.Name())
 
-				// Iterate through the files in the archive
-				for _, f := range z.File {
-					crc := fmt.Sprintf("%x", f.CRC32)
-					for i := 8 - len(crc); i > 0; i = i - 1 {
-						crc = "0" + crc
-					}
-					// fmt.Println(crc)
-					rom := machine.Rom(crc)
-					if rom == nil {
-						fmt.Printf("Contents of %s(crc:%s) is redundant file.\n", f.Name, crc)
-						continue
-					}
-					rom.Availabl = true
-				}
-
-				z.Close()
-
-				fmt.Println(machine.Roms)
 			case strings.HasSuffix(info.Name(), ".7z"):
+				mame.Audit7zFile(dir, info.Name())
+
 			default:
+				fmt.Println("\n--- " + info.Name() + " ---")
+				fmt.Println(dir + "/" + info.Name() + " is not a vaild file.")
 			}
 
 		}
+		fmt.Println("\n==========")
 	}
 
+	mame.UpdateAllMachineStatus()
 	mame.Flush()
 	return
 }
 
-func (machine *Machine) Rom(crc string) (rom *Rom) {
-	for k, _ := range machine.Roms {
-		if machine.Roms[k].Crc == crc {
-			rom = &machine.Roms[k]
-			return
+func (mame *Mame) UpdateAllMachineStatus() {
+	// first : deal with bios/device machine
+	for k, _ := range mame.Machines {
+		machine := &mame.Machines[k]
+		switch {
+		case machine.MachineStatus == MACHINE_NEXIST:
+			continue
+		case machine.Isbios || machine.Isdevice:
+			mame.UpdateMachineStatus(machine.Name)
+		}
+	}
+	// second : deal with major machine
+	for k, _ := range mame.Machines {
+		machine := &mame.Machines[k]
+		if machine.Cloneof == "" && !machine.Isbios && !machine.Isdevice {
+			mame.UpdateMachineStatus(machine.Name)
+		}
+	}
+	// third : deal with clone machine
+	for k, _ := range mame.Machines {
+		machine := &mame.Machines[k]
+		if machine.Cloneof != "" && !machine.Isbios && !machine.Isdevice {
+			mame.UpdateMachineStatus(machine.Name)
 		}
 	}
 
-	return
 }
 
-func (machine *Machine) Disk(sha1 string) (disk *Disk) {
-	for k, _ := range machine.Disks {
-		if machine.Disks[k].Sha1 == sha1 {
-			disk = &machine.Disks[k]
+func (mame *Mame) UpdateMachineStatus(machineName string) {
+	machine := mame.Machine(machineName)
+	if machine == nil {
+		return
+	}
+
+	if machine.Romof != "" {
+		upperMachine := mame.Machine(machine.Romof)
+		if upperMachine != nil {
+			for k, rom := range machine.Roms {
+				if rom.RomStatus == ROM_NEXIST && rom.Merge != "" {
+					upperRom := machine.Rom(rom.Crc)
+					if upperRom != nil {
+						machine.Roms[k].RomStatus = upperRom.RomStatus
+					}
+				}
+			}
+		}
+	}
+	for _, rom := range machine.Roms {
+		if rom.RomStatus == ROM_NEXIST && rom.Status != "nodump" {
+			machine.MachineStatus &^= MACHINE_EXIST_V
+			return
+		}
+	}
+	for _, disk := range machine.Disks {
+		if disk.DiskStatus == DISK_NEXIST && disk.Status != "nodump" {
+			machine.MachineStatus &^= MACHINE_EXIST_V
 			return
 		}
 	}
 
-	return
+	if machine.MachineStatus&MACHINE_EXIST == MACHINE_EXIST {
+		machine.MachineStatus |= MACHINE_EXIST_V
+	}
+}
+
+func (mame *Mame) AuditZipFile(dir, fileName string) {
+	if !strings.HasSuffix(fileName, ".zip") {
+		return
+	}
+
+	fmt.Println("\n--- " + fileName + " ---")
+	machineName := strings.TrimSuffix(fileName, ".zip")
+	machineFilePath := dir + "/" + fileName
+
+	machine := mame.Machine(machineName)
+	if machine == nil {
+		fmt.Println(machineFilePath + " is not a vaild file.")
+		return
+	}
+	machine.MachineStatus |= MACHINE_EXIST
+
+	// Open zip file for reading.
+	z, err := zip.OpenReader(machineFilePath)
+	CheckError(err)
+	// Iterate through the files in zip file
+	for _, f := range z.File {
+		crc := fmt.Sprintf("%x", f.CRC32)
+		for i := 8 - len(crc); i > 0; i = i - 1 {
+			crc = "0" + crc
+		}
+		// fmt.Println(crc)
+		rom := machine.Rom(crc)
+		if rom == nil {
+			fmt.Printf("%s(crc:%s) is redundant file.\n", f.Name, crc)
+			machine.MachineStatus |= MACHINE_EXIST_R
+			continue
+		}
+
+		machine.MachineStatus |= MACHINE_EXIST_P
+		rom.RomStatus |= ROM_EXIST
+		if f.Name != rom.Name {
+			rom.RomStatus |= ROM_EXIST_WN
+		}
+	}
+
+	z.Close()
+}
+
+func (mame *Mame) AuditCHDFolder(dir, folderName string) {
+	fmt.Println("\n--- " + folderName + " ---")
+	CHDMachineName := folderName
+	CHDFolderPath := dir + "/" + CHDMachineName
+
+	machine := mame.Machine(CHDMachineName)
+	if machine == nil {
+		fmt.Println(CHDFolderPath + " is not a vaild directory.")
+		return
+	}
+	machine.MachineStatus |= MACHINE_EXIST
+
+	// Iterate through the files in the chd directory
+	list, err := ioutil.ReadDir(CHDFolderPath)
+	CheckError(err)
+	for _, info := range list {
+		CHDFileName := info.Name()
+		CHDFilePath := CHDFolderPath + "/" + CHDFileName
+		/*    if !strings.HasSuffix(CHDFileName, ".chd") { */
+		// fmt.Println(CHDFilePath + " is not a CHD file.")
+		// continue
+		/* } */
+
+		// check sha1 of chd file
+		data, err := ioutil.ReadFile(CHDFilePath)
+		CheckError(err)
+		sha1 := fmt.Sprintf("%x", sha1.Sum(data))
+		disk := machine.Disk(sha1)
+		if disk == nil {
+			fmt.Printf("%s(sha1:%s) is redundant file.\n", CHDFileName, sha1)
+			machine.MachineStatus |= MACHINE_EXIST_R
+			continue
+		}
+
+		machine.MachineStatus |= MACHINE_EXIST_P
+		disk.DiskStatus |= DISK_EXIST
+		diskName := CHDFileName[0:strings.LastIndex(CHDFileName, ".")]
+		if diskName != disk.Name {
+			disk.DiskStatus |= DISK_EXIST_WN
+		}
+	}
+}
+
+func (mame *Mame) Audit7zFile(dir, fileName string) {
+	if !strings.HasSuffix(fileName, ".7z") {
+		return
+	}
+
+	fmt.Println("\n--- " + fileName + " ---")
+	machineName := strings.TrimSuffix(fileName, ".7z")
+	machineFilePath := dir + "/" + fileName
+
+	machine := mame.Machine(machineName)
+	if machine == nil {
+		fmt.Println(machineFilePath + " is not a vaild file.")
+		return
+	}
 }

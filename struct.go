@@ -1,5 +1,34 @@
 package main
 
+const NEXIST int = 0
+
+type MachineStatus int
+
+const (
+	MACHINE_NEXIST = 0
+	MACHINE_EXIST  = 1 << (iota - 1)
+	MACHINE_EXIST_R
+	MACHINE_EXIST_P
+	MACHINE_EXIST_V
+	MACHINE_EMPTY
+)
+
+type RomStatus int
+
+const (
+	ROM_NEXIST   = 0
+	ROM_EXIST    = 1 << (iota - 1)
+	ROM_EXIST_WN // valid but with wrong name
+)
+
+type DiskStatus int
+
+const (
+	DISK_NEXIST   = 0
+	DISK_EXIST    = 1 << (iota - 1)
+	DISK_EXIST_WN // valid but with wrong name
+)
+
 //<!DOCTYPE mame [
 //<!ELEMENT mame (machine+)>
 //	<!ATTLIST mame build CDATA #IMPLIED>
@@ -59,6 +88,8 @@ type Machine struct {
 	//Slots          []Slot          `xml:"slot"`
 	//Softwarelists  []Softwarelist  `xml:"softwarelist"`
 	//Ramoptions     []Ramoption     `xml:"ramoption"`
+
+	MachineStatus MachineStatus
 }
 
 //		<!ELEMENT biosset EMPTY>
@@ -94,7 +125,7 @@ type Rom struct {
 	Status   string `xml:"status,attr"`
 	Optional bool   `xml:"optional,attr"`
 
-	Availabl bool
+	RomStatus RomStatus
 }
 
 //		<!ELEMENT disk EMPTY>
@@ -116,7 +147,7 @@ type Disk struct {
 	Status   string `xml:"status,attr"`
 	Optional bool   `xml:"optional,attr"`
 
-	Availabl bool
+	DiskStatus DiskStatus
 }
 
 //		<!ELEMENT device_ref EMPTY>
