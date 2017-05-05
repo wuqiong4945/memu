@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"os/exec"
 	"runtime"
 	"time"
 
@@ -44,10 +43,11 @@ func main() {
 	fmt.Printf("%#v\n", mame.Debug)
 	fmt.Println(mame.Machine("qsound"))
 
-	// out := mame.VerifyRoms("qsound")
-	out, err := exec.Command("mame/mame64", "-verifyroms", "qsound").Output()
-	//out, err = exec.Command("mame/mame64", "kov2p").Output()
-	fmt.Println(out, err)
+	out := mame.VerifyRoms("qsound")
+	fmt.Println(string(out))
+
+	// out = mame.Machine("sfa3").Start()
+	// fmt.Println(string(out))
 
 	// info := GetInfo("aoh", "history")
 	// fmt.Println(info)
@@ -55,9 +55,20 @@ func main() {
 	var info string
 	for _, machine := range mame.Machines {
 		if machine.MachineStatus != MACHINE_NEXIST {
-			info += machine.Status()
+			info += machine.GetStatusInfo()
 		}
 	}
+
+	/*  ms, err := mame.Search("chess") */
+	// CheckError(err)
+	// if err == nil {
+	// info += "<table>"
+	// for _, m := range ms {
+	// info += "<tr><td>" + m.Name + "</td><td>" + m.Description + "</td><td>" + m.Year + "</td></tr>"
+	// }
+	// info += "</table>"
+	/* } */
+
 	html, _ := os.OpenFile("info.html", os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	defer html.Close()
 	html.WriteString(info)

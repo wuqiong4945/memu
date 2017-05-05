@@ -49,6 +49,13 @@ func (mame *Mame) Fresh() {
 	err = xml.Unmarshal(data, mame)
 	CheckError(err)
 
+	for k, machine := range mame.Machines {
+		if machine.Romof == "" {
+			continue
+		}
+		mame.Machines[k].UpperMachine = mame.Machine(machine.Romof)
+	}
+
 	mame.Flush()
 	return
 }
@@ -123,7 +130,25 @@ func (mame *Mame) Update() {
 	return
 }
 
-func (mame *Mame) Machine(machineName string) (machine *Machine) {
+func (mame Mame) Search(key string) (machines []Machine, err error) {
+	reg, err := regexp.Compile(key)
+	if err != nil {
+		CheckError(err)
+		return
+	}
+
+	for _, machine := range mame.Machines {
+		if reg.FindStringIndex(machine.Description) != nil ||
+			reg.FindStringIndex(machine.Name) != nil {
+			machines = append(machines, machine)
+			continue
+		}
+	}
+
+	return
+}
+
+func (mame Mame) Machine(machineName string) (machine *Machine) {
 	for k, _ := range mame.Machines {
 		if mame.Machines[k].Name == machineName {
 			machine = &mame.Machines[k]
@@ -142,7 +167,7 @@ func (mame Mame) VerifyRoms(machineName string) (result []byte) {
 
 func (mame *Mame) Audit() {
 	t := time.Now()
-	defer fmt.Printf("Audit time: %s\n", time.Now().Sub(t).String())
+	// defer fmt.Printf("Audit time: %s\n", time.Now().Sub(t).String())
 
 	// reset status
 	for k, _ := range mame.Machines {
@@ -155,10 +180,12 @@ func (mame *Mame) Audit() {
 		}
 	}
 
-	romDirs := "roms"
+	mamePath := cfg.Section("general").Key("mame").MustString("mame/mame64")
+	romDefaultPath := mamePath[0:strings.LastIndex(mamePath, "/")] + "/roms"
+	romPath := cfg.Section("general").Key("rompath").MustString(romDefaultPath)
 	//fullPath, _ := filepath.Abs(path)
 	// idleFiles := []string{}
-	dirs := strings.Split(romDirs, ";")
+	dirs := strings.Split(romPath, ",")
 	for _, dir := range dirs {
 		list, err := ioutil.ReadDir(dir)
 		CheckError(err)
@@ -189,6 +216,8 @@ func (mame *Mame) Audit() {
 
 	mame.UpdateAllMachineStatus()
 	mame.Flush()
+
+	fmt.Printf("Audit time: %s\n", time.Now().Sub(t).String())
 	return
 }
 
@@ -200,61 +229,24 @@ func (mame *Mame) UpdateAllMachineStatus() {
 		case machine.MachineStatus == MACHINE_NEXIST:
 			continue
 		case machine.Isbios || machine.Isdevice:
-			mame.UpdateMachineStatus(machine.Name)
+			machine.UpdateStatus()
 		}
 	}
 	// second : deal with major machine
 	for k, _ := range mame.Machines {
 		machine := &mame.Machines[k]
 		if machine.Cloneof == "" && !machine.Isbios && !machine.Isdevice {
-			mame.UpdateMachineStatus(machine.Name)
+			machine.UpdateStatus()
 		}
 	}
 	// third : deal with clone machine
 	for k, _ := range mame.Machines {
 		machine := &mame.Machines[k]
 		if machine.Cloneof != "" && !machine.Isbios && !machine.Isdevice {
-			mame.UpdateMachineStatus(machine.Name)
+			machine.UpdateStatus()
 		}
 	}
 
-}
-
-func (mame *Mame) UpdateMachineStatus(machineName string) {
-	machine := mame.Machine(machineName)
-	if machine == nil {
-		return
-	}
-
-	if machine.Romof != "" {
-		upperMachine := mame.Machine(machine.Romof)
-		if upperMachine != nil {
-			for k, rom := range machine.Roms {
-				if rom.RomStatus == ROM_NEXIST && rom.Merge != "" {
-					upperRom := machine.Rom(rom.Crc)
-					if upperRom != nil {
-						machine.Roms[k].RomStatus = upperRom.RomStatus
-					}
-				}
-			}
-		}
-	}
-	for _, rom := range machine.Roms {
-		if rom.RomStatus == ROM_NEXIST && rom.Status != "nodump" {
-			machine.MachineStatus &^= MACHINE_EXIST_V
-			return
-		}
-	}
-	for _, disk := range machine.Disks {
-		if disk.DiskStatus == DISK_NEXIST && disk.Status != "nodump" {
-			machine.MachineStatus &^= MACHINE_EXIST_V
-			return
-		}
-	}
-
-	if machine.MachineStatus&MACHINE_EXIST == MACHINE_EXIST {
-		machine.MachineStatus |= MACHINE_EXIST_V
-	}
 }
 
 func (mame *Mame) AuditZipFile(dir, fileName string) {
