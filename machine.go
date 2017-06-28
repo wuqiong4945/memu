@@ -25,23 +25,6 @@ func (machine Machine) Start() (result []byte) {
 }
 
 func (machine Machine) GetStatusInfo() (info string) {
-	// var machineStatus string
-	/*  switch machine.MachineStatus { */
-	// case MACHINE_NEXIST:
-	// machineStatus = "MACHINE_NEXIST"
-	// case MACHINE_EXIST:
-	// machineStatus = "MACHINE_NEXIST"
-	// case MACHINE_EXIST_R:
-	// machineStatus = "MACHINE_NEXIST"
-	// case MACHINE_EXIST_P:
-	// machineStatus = "MACHINE_NEXIST"
-	// case MACHINE_EXIST_V:
-	// machineStatus = "MACHINE_NEXIST"
-	// case MACHINE_EMPTY:
-	// machineStatus = "MACHINE_NEXIST"
-	// default:
-	// machineStatus = "MACHINE_NEXIST"
-	/* } */
 	machineStatus := fmt.Sprintf("%b", machine.MachineStatus)
 	info += `<table border="1">`
 	info += `<tr style="color:red">` +

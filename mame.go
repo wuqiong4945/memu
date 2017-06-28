@@ -310,10 +310,10 @@ func (mame *Mame) AuditCHDFolder(dir, folderName string) {
 	for _, info := range list {
 		CHDFileName := info.Name()
 		CHDFilePath := CHDFolderPath + "/" + CHDFileName
-		/*    if !strings.HasSuffix(CHDFileName, ".chd") { */
-		// fmt.Println(CHDFilePath + " is not a CHD file.")
-		// continue
-		/* } */
+		if !strings.HasSuffix(CHDFileName, ".chd") {
+			fmt.Println(CHDFilePath + " is not a CHD file.")
+			continue
+		}
 
 		// check sha1 of chd file
 		data, err := ioutil.ReadFile(CHDFilePath)
