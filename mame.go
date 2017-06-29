@@ -3,11 +3,11 @@ package main
 import (
 	"archive/zip"
 	"bufio"
+	"bytes"
 	"crypto/sha1"
 	"encoding/gob"
 	"encoding/xml"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -40,13 +40,9 @@ func NewMame() (mame *Mame) {
 func (mame *Mame) Fresh() {
 	*mame = Mame{}
 
-	f, err := os.Open("a.xml")
+	out, err := exec.Command(mamePath, "-listxml").Output()
 	CheckError(err)
-	defer f.Close()
-
-	data, err := ioutil.ReadAll(f)
-	CheckError(err)
-	err = xml.Unmarshal(data, mame)
+	err = xml.Unmarshal(out, mame)
 	CheckError(err)
 
 	for k, machine := range mame.Machines {
@@ -56,7 +52,7 @@ func (mame *Mame) Fresh() {
 		mame.Machines[k].UpperMachine = mame.Machine(machine.Romof)
 	}
 
-	mame.Flush()
+	isFlush = true
 	return
 }
 
@@ -85,45 +81,48 @@ func (mame *Mame) Update() {
 		return
 	}
 
-	f, err := os.Open("a.xml")
-	CheckError(err)
-	defer f.Close()
+	// f, err := os.Open("a.xml")
+	// CheckError(err)
+	// defer f.Close()
 
-	reader := bufio.NewReader(f)
-	var version string
-	reg := regexp.MustCompile(`^\s*(\w+)\s*=\s*"([^\"]*)"\s+`)
-	for {
-		lineBytes, _, err := reader.ReadLine()
-		line := strings.TrimSpace(string(lineBytes))
-		if strings.HasPrefix(line, "<mame ") {
-			line = strings.TrimPrefix(line, "<mame ")
-			line = strings.TrimSuffix(line, ">") + " "
+	// reader := bufio.NewReader(f)
+	// var version string
+	// reg := regexp.MustCompile(`^\s*(\w+)\s*=\s*"([^\"]*)"\s+`)
+	// for {
+	// lineBytes, _, err := reader.ReadLine()
+	// line := strings.TrimSpace(string(lineBytes))
+	// if strings.HasPrefix(line, "<mame ") {
+	// line = strings.TrimPrefix(line, "<mame ")
+	// line = strings.TrimSuffix(line, ">") + " "
 
-			for {
-				attr := reg.FindString(line)
-				if attr == "" {
-					break
-				}
+	// for {
+	// attr := reg.FindString(line)
+	// if attr == "" {
+	// break
+	// }
 
-				key := reg.ReplaceAllString(attr, `$1`)
-				value := reg.ReplaceAllString(attr, `$2`)
-				if key == "build" {
-					version = value
-					break
-				}
+	// key := reg.ReplaceAllString(attr, `$1`)
+	// value := reg.ReplaceAllString(attr, `$2`)
+	// if key == "build" {
+	// version = value
+	// break
+	// }
 
-				line = strings.TrimPrefix(line, attr)
-			}
+	// line = strings.TrimPrefix(line, attr)
+	// }
 
-			break
-		}
+	// break
+	// }
 
-		if err == io.EOF {
-			break
-		}
-	}
+	// if err == io.EOF {
+	// break
+	// }
+	// }
 
-	if version > mame.Build {
+	version := mame.Version()
+	l := len(mame.Build)
+	v := version[len(version)-l : len(version)]
+	if v > mame.Build {
 		mame.Fresh()
 	}
 
@@ -160,7 +159,6 @@ func (mame Mame) Machine(machineName string) (machine *Machine) {
 }
 
 func (mame Mame) VerifyRoms(machineName string) (result []byte) {
-	mamePath := cfg.Section("general").Key("mame").MustString("mame/mame64")
 	result, _ = exec.Command(mamePath, "-verifyroms", machineName).Output()
 	return
 }
@@ -180,8 +178,7 @@ func (mame *Mame) Audit() {
 		}
 	}
 
-	mamePath := cfg.Section("general").Key("mame").MustString("mame/mame64")
-	romDefaultPath := mamePath[0:strings.LastIndex(mamePath, "/")] + "/roms"
+	romDefaultPath := "roms," + mamePath[0:strings.LastIndex(mamePath, "/")] + "/roms"
 	romPath := cfg.Section("general").Key("rompath").MustString(romDefaultPath)
 	//fullPath, _ := filepath.Abs(path)
 	// idleFiles := []string{}
@@ -215,7 +212,7 @@ func (mame *Mame) Audit() {
 	}
 
 	mame.UpdateAllMachineStatus()
-	mame.Flush()
+	isFlush = true
 
 	fmt.Printf("Audit time: %s\n", time.Now().Sub(t).String())
 	return
@@ -282,7 +279,9 @@ func (mame *Mame) AuditZipFile(dir, fileName string) {
 			continue
 		}
 
+		machine.MachineStatus &^= MACHINE_NEXIST
 		machine.MachineStatus |= MACHINE_EXIST_P
+		rom.RomStatus &^= ROM_NEXIST
 		rom.RomStatus |= ROM_EXIST
 		if f.Name != rom.Name {
 			rom.RomStatus |= ROM_EXIST_WN
@@ -326,7 +325,9 @@ func (mame *Mame) AuditCHDFolder(dir, folderName string) {
 			continue
 		}
 
+		machine.MachineStatus &^= MACHINE_NEXIST
 		machine.MachineStatus |= MACHINE_EXIST_P
+		disk.DiskStatus &^= DISK_NEXIST
 		disk.DiskStatus |= DISK_EXIST
 		diskName := CHDFileName[0:strings.LastIndex(CHDFileName, ".")]
 		if diskName != disk.Name {
@@ -349,4 +350,14 @@ func (mame *Mame) Audit7zFile(dir, fileName string) {
 		fmt.Println(machineFilePath + " is not a vaild file.")
 		return
 	}
+}
+
+func (mame Mame) Version() (version string) {
+	out, _ := exec.Command(mamePath, "-help").Output()
+	// b := bytes.NewBuffer(out)
+	// b.ReadString(' ')
+	// version, _ = b.ReadString(' ')
+	v, _, _ := bufio.NewReader(bytes.NewBuffer(out)).ReadLine()
+	version = string(v)
+	return
 }

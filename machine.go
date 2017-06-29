@@ -12,7 +12,6 @@ import (
 )
 
 func (machine Machine) Start() (result []byte) {
-	mamePath := cfg.Section("general").Key("mame").MustString("mame/mame64")
 	f, err := os.Open(mamePath)
 	CheckError(err)
 	if os.IsNotExist(err) {
@@ -282,6 +281,7 @@ func (machine *Machine) UpdateStatus() {
 
 	if machine.MachineStatus&MACHINE_EXIST == MACHINE_EXIST {
 		machine.MachineStatus |= MACHINE_EXIST_V
+		machine.MachineStatus &^= MACHINE_EXIST_P
 	}
 }
 
