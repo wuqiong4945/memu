@@ -3,8 +3,7 @@ package main
 type MachineStatus int
 
 const (
-	MACHINE_NEXIST = 1 << iota
-	MACHINE_EXIST
+	MACHINE_EXIST   = 1 << iota
 	MACHINE_EXIST_R // reluctant file
 	MACHINE_EXIST_P // partly valid
 	MACHINE_EXIST_V // valid
@@ -14,16 +13,14 @@ const (
 type RomStatus int
 
 const (
-	ROM_NEXIST = 1 << iota
-	ROM_EXIST
+	ROM_EXIST    = 1 << iota
 	ROM_EXIST_WN // valid but with wrong name
 )
 
 type DiskStatus int
 
 const (
-	DISK_NEXIST = 1 << iota
-	DISK_EXIST
+	DISK_EXIST    = 1 << iota
 	DISK_EXIST_WN // valid but with wrong name
 )
 

@@ -35,8 +35,9 @@ func main() {
 	fmt.Println("system infomation : " + runtime.GOOS + "/" + runtime.GOARCH)
 	t := time.Now()
 	fmt.Println("start memu!")
+
 	mame := NewMame()
-	fmt.Printf("took amount of time: %s\n", time.Now().Sub(t).String())
+	fmt.Printf("starting took amount of time: %s\n", time.Now().Sub(t).String())
 	mame.Update()
 	mame.Audit()
 
@@ -52,13 +53,15 @@ func main() {
 
 	// info := GetInfo("aoh", "history")
 	// fmt.Println(info)
-	// exec.Command("firefox", info).Output()
 	var info string
 	for _, machine := range mame.Machines {
-		if machine.MachineStatus != MACHINE_NEXIST {
+		if machine.MachineStatus&MACHINE_EXIST == MACHINE_EXIST {
 			info += machine.GetStatusInfo()
 		}
 	}
+	info += mame.Machine("mslug3").GetStatusInfo()
+	info += mame.Machine("kov2p").GetStatusInfo()
+	info += mame.Machine("pgm").GetStatusInfo()
 
 	/*  ms, err := mame.Search("chess") */
 	// CheckError(err)
@@ -74,7 +77,6 @@ func main() {
 	defer html.Close()
 	html.WriteString(info)
 
-	fmt.Println(mamePath)
 	// out, _ = exec.Command(mamePath, "-lx").Output()
 	// html.WriteString(string(out))
 

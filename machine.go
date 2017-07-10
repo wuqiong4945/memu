@@ -248,7 +248,7 @@ func (machine *Machine) UpdateStatus() {
 	upperMachine := machine.UpperMachine
 	if machine.Romof != "" && upperMachine != nil {
 		for k, rom := range machine.Roms {
-			if rom.RomStatus != ROM_NEXIST || rom.Merge == "" {
+			if rom.RomStatus&ROM_EXIST == ROM_EXIST || rom.Merge == "" {
 				continue
 			}
 			upperRom := upperMachine.Rom(rom.Crc)
@@ -257,7 +257,7 @@ func (machine *Machine) UpdateStatus() {
 			}
 		}
 		for k, disk := range machine.Disks {
-			if disk.DiskStatus != DISK_NEXIST || disk.Merge == "" {
+			if disk.DiskStatus&DISK_EXIST == DISK_EXIST || disk.Merge == "" {
 				continue
 			}
 			upperDisk := upperMachine.Disk(disk.Sha1)
@@ -267,13 +267,13 @@ func (machine *Machine) UpdateStatus() {
 		}
 	}
 	for _, rom := range machine.Roms {
-		if rom.RomStatus == ROM_NEXIST && rom.Status != "nodump" {
+		if rom.RomStatus&ROM_EXIST != ROM_EXIST && rom.Status != "nodump" {
 			machine.MachineStatus &^= MACHINE_EXIST_V
 			return
 		}
 	}
 	for _, disk := range machine.Disks {
-		if disk.DiskStatus == DISK_NEXIST && disk.Status != "nodump" {
+		if disk.DiskStatus&DISK_EXIST != DISK_EXIST && disk.Status != "nodump" {
 			machine.MachineStatus &^= MACHINE_EXIST_V
 			return
 		}

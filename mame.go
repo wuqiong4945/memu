@@ -169,12 +169,12 @@ func (mame *Mame) Audit() {
 
 	// reset status
 	for k, _ := range mame.Machines {
-		mame.Machines[k].MachineStatus = MACHINE_NEXIST
+		mame.Machines[k].MachineStatus = 0
 		for m, _ := range mame.Machines[k].Roms {
-			mame.Machines[k].Roms[m].RomStatus = ROM_NEXIST
+			mame.Machines[k].Roms[m].RomStatus = 0
 		}
 		for m, _ := range mame.Machines[k].Disks {
-			mame.Machines[k].Disks[m].DiskStatus = DISK_NEXIST
+			mame.Machines[k].Disks[m].DiskStatus = 0
 		}
 	}
 
@@ -223,7 +223,7 @@ func (mame *Mame) UpdateAllMachineStatus() {
 	for k, _ := range mame.Machines {
 		machine := &mame.Machines[k]
 		switch {
-		case machine.MachineStatus == MACHINE_NEXIST:
+		case machine.MachineStatus&MACHINE_EXIST != MACHINE_EXIST:
 			continue
 		case machine.Isbios || machine.Isdevice:
 			machine.UpdateStatus()
@@ -279,9 +279,7 @@ func (mame *Mame) AuditZipFile(dir, fileName string) {
 			continue
 		}
 
-		machine.MachineStatus &^= MACHINE_NEXIST
 		machine.MachineStatus |= MACHINE_EXIST_P
-		rom.RomStatus &^= ROM_NEXIST
 		rom.RomStatus |= ROM_EXIST
 		if f.Name != rom.Name {
 			rom.RomStatus |= ROM_EXIST_WN
@@ -325,9 +323,7 @@ func (mame *Mame) AuditCHDFolder(dir, folderName string) {
 			continue
 		}
 
-		machine.MachineStatus &^= MACHINE_NEXIST
 		machine.MachineStatus |= MACHINE_EXIST_P
-		disk.DiskStatus &^= DISK_NEXIST
 		disk.DiskStatus |= DISK_EXIST
 		diskName := CHDFileName[0:strings.LastIndex(CHDFileName, ".")]
 		if diskName != disk.Name {
