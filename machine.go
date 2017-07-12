@@ -33,12 +33,13 @@ func (machine Machine) GetStatusInfo() (info string) {
 
 	var ancesterMachineByRom func(Machine, Rom) Machine
 	ancesterMachineByRom = func(machine Machine, rom Rom) Machine {
+		upperMachine := machine.UpperMachine()
 		if rom.Merge == "" ||
-			machine.UpperMachine == nil ||
-			machine.UpperMachine.Rom(rom.Crc) == nil {
+			upperMachine == nil ||
+			upperMachine.Rom(rom.Crc) == nil {
 			return machine
 		}
-		return ancesterMachineByRom(*machine.UpperMachine, rom)
+		return ancesterMachineByRom(*upperMachine, rom)
 	}
 	for _, rom := range machine.Roms {
 		m := ancesterMachineByRom(machine, rom)
@@ -57,12 +58,13 @@ func (machine Machine) GetStatusInfo() (info string) {
 
 	var ancesterMachineByDisk func(Machine, Disk) Machine
 	ancesterMachineByDisk = func(machine Machine, disk Disk) Machine {
+		upperMachine := machine.UpperMachine()
 		if disk.Merge == "" ||
-			machine.UpperMachine == nil ||
-			machine.UpperMachine.Disk(disk.Sha1) == nil {
+			upperMachine == nil ||
+			upperMachine.Disk(disk.Sha1) == nil {
 			return machine
 		}
-		return ancesterMachineByDisk(*machine.UpperMachine, disk)
+		return ancesterMachineByDisk(*upperMachine, disk)
 	}
 	for _, disk := range machine.Disks {
 		m := ancesterMachineByDisk(machine, disk)
@@ -245,7 +247,7 @@ func (machine *Machine) UpdateStatus() {
 		return
 	}
 
-	upperMachine := machine.UpperMachine
+	upperMachine := machine.UpperMachine()
 	if machine.Romof != "" && upperMachine != nil {
 		for k, rom := range machine.Roms {
 			if rom.RomStatus&ROM_EXIST == ROM_EXIST || rom.Merge == "" {
@@ -304,5 +306,14 @@ func (machine *Machine) Disk(sha1 string) (disk *Disk) {
 		}
 	}
 
+	return
+}
+
+func (machine Machine) UpperMachine() (upperMachine *Machine) {
+	if machine.Romof == "" {
+		return
+	}
+
+	upperMachine = mame.Machine(machine.Romof)
 	return
 }

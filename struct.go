@@ -84,7 +84,6 @@ type Machine struct {
 	//Softwarelists  []Softwarelist  `xml:"softwarelist"`
 	//Ramoptions     []Ramoption     `xml:"ramoption"`
 
-	UpperMachine  *Machine
 	MachineStatus MachineStatus
 }
 

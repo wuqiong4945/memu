@@ -14,6 +14,7 @@ var cfg *ini.File
 var iniFileName = "memu.ini"
 var mamePath = "mame/mame64"
 var isFlush = false
+var mame *Mame
 
 func main() {
 	var err error
@@ -36,7 +37,7 @@ func main() {
 	t := time.Now()
 	fmt.Println("start memu!")
 
-	mame := NewMame()
+	mame = NewMame()
 	fmt.Printf("starting took amount of time: %s\n", time.Now().Sub(t).String())
 	mame.Update()
 	mame.Audit()

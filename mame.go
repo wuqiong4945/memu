@@ -45,13 +45,6 @@ func (mame *Mame) Fresh() {
 	err = xml.Unmarshal(out, mame)
 	CheckError(err)
 
-	for k, machine := range mame.Machines {
-		if machine.Romof == "" {
-			continue
-		}
-		mame.Machines[k].UpperMachine = mame.Machine(machine.Romof)
-	}
-
 	isFlush = true
 	return
 }
