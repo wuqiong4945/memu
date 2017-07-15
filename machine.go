@@ -24,13 +24,6 @@ func (machine Machine) Start() (result []byte) {
 }
 
 func (machine Machine) GetStatusInfo() (info string) {
-	machineStatus := fmt.Sprintf("%b", machine.MachineStatus)
-	info += `<table border="1">`
-	info += `<tr style="color:red">` +
-		"<th>" + machine.Name + "</th>" +
-		"<th>" + machineStatus + "</th>" +
-		"</tr>"
-
 	var ancesterMachineByRom func(Machine, Rom) Machine
 	ancesterMachineByRom = func(machine Machine, rom Rom) Machine {
 		upperMachine := machine.UpperMachine()
@@ -40,20 +33,6 @@ func (machine Machine) GetStatusInfo() (info string) {
 			return machine
 		}
 		return ancesterMachineByRom(*upperMachine, rom)
-	}
-	for _, rom := range machine.Roms {
-		m := ancesterMachineByRom(machine, rom)
-		ancesterMachineName := m.Name
-		if ancesterMachineName == machine.Name {
-			ancesterMachineName = ""
-		}
-		info += "<tr>" +
-			"<td>rom</td>" +
-			"<td>" + rom.Name + "</td>" +
-			"<td>" + fmt.Sprintf("%b", rom.RomStatus) + "</td>" +
-			"<td>" + rom.Status + "</td>" +
-			"<td>" + ancesterMachineName + "</td>" +
-			"</tr>"
 	}
 
 	var ancesterMachineByDisk func(Machine, Disk) Machine
@@ -66,22 +45,111 @@ func (machine Machine) GetStatusInfo() (info string) {
 		}
 		return ancesterMachineByDisk(*upperMachine, disk)
 	}
+
+	machineStatus := fmt.Sprintf("%b", machine.MachineStatus)
+	info += "\n"
+	// info += `<div class="col-sm-3">`
+	info += `<div class="card w-25">`
+	// info += `<div class="card">`
+	info += "\n"
+
+	// header
+	info += `	<div class="card-header">` + machine.Name + " (" + machineStatus + ")" + ``
+	info += `		<ul class="nav nav-tabs card-header-tabs" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_Roms" role="tab">Roms</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_History" role="tab">History</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_None" role="tab">None</a>
+      </li>
+		</ul>`
+	info += "\n"
+	info += `	</div>`
+	info += "\n"
+
+	// image
+	picName := "snap/" + machine.Name + ".png"
+	_, err := os.Stat(picName)
+	switch {
+	case !os.IsNotExist(err):
+		info += `	<img class="card-img-top img-fluid" src="` + picName + `" alt="` + machine.Name + `">`
+	case os.IsNotExist(err) && machine.Cloneof != "":
+		picName := "snap/" + machine.Cloneof + ".png"
+		if _, err := os.Stat(picName); !os.IsNotExist(err) {
+			info += `	<img class="card-img-top img-fluid" src="` + picName + `" alt="` + machine.Name + `">`
+		}
+	}
+	info += "\n"
+
+	info += `	<div class="tab-content">`
+	info += "\n"
+	// info += `<div class="card-block">`
+	info += `		<div class="tab-pane" id="` + machine.Name + `_Roms" role="tabpanel">`
+	info += "\n"
+	// block
+	info += `			<table class="table table-striped table-sm">`
+	info += "\n"
+	for _, rom := range machine.Roms {
+		m := ancesterMachineByRom(machine, rom)
+		ancesterMachineName := m.Name
+		if ancesterMachineName == machine.Name {
+			ancesterMachineName = ""
+		}
+		info += "				<tr>" +
+			"<td>rom</td>" +
+			"<td>" + rom.Name + "</td>" +
+			"<td>" + fmt.Sprintf("%b", rom.RomStatus) + "</td>" +
+			"<td>" + rom.Status + "</td>" +
+			"<td>" + ancesterMachineName + "</td>" +
+			"</tr>"
+		info += "\n"
+	}
+
 	for _, disk := range machine.Disks {
 		m := ancesterMachineByDisk(machine, disk)
 		ancesterMachineName := m.Name
 		if ancesterMachineName == machine.Name {
 			ancesterMachineName = ""
 		}
-		info += "<tr>" +
+		info += "				<tr>" +
 			"<td>disk</td>" +
 			"<td>" + disk.Name + "</td>" +
 			"<td>" + fmt.Sprintf("%b", disk.DiskStatus) + "</td>" +
 			"<td>" + disk.Status + "</td>" +
 			"<td>" + ancesterMachineName + "</td>" +
 			"</tr>"
+		info += "\n"
 	}
 
-	info += "</table>"
+	info += `			</table>`
+	info += "\n"
+	info += `		</div>`
+	info += "\n"
+
+	info += `		<div class="tab-pane" id="` + machine.Name + `_History" role="tabpanel">`
+	info += machine.GetHistoryInfo()
+	info += `		</div>`
+	info += "\n"
+
+	info += `		<div class="tab-pane" id="` + machine.Name + `_None" role="tabpanel">`
+	info += `		</div>`
+	info += "\n"
+
+	// info += `</div>` // block
+	info += `	</div>`
+	info += "\n"
+	// info += `	</div>`
+
+	// footer
+	info += `	<div class="card-footer text-muted text-right">` + machineStatus + `</div>`
+	info += "\n"
+
+	// info += `</div>`
+	info += `</div>`
+	info += "\n"
 	return
 }
 

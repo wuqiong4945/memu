@@ -40,7 +40,7 @@ func main() {
 	mame = NewMame()
 	fmt.Printf("starting took amount of time: %s\n", time.Now().Sub(t).String())
 	mame.Update()
-	mame.Audit()
+	// mame.Audit()
 
 	fmt.Println("current mame version is : " + mame.Build)
 	fmt.Printf("%#v\n", mame.Debug)
@@ -55,14 +55,14 @@ func main() {
 	// info := GetInfo("aoh", "history")
 	// fmt.Println(info)
 	var info string
+	info += htmlHead
+	// info += `<div class="card-columns">`
+	info += `<div class="row">`
 	for _, machine := range mame.Machines {
 		if machine.MachineStatus&MACHINE_EXIST == MACHINE_EXIST {
 			info += machine.GetStatusInfo()
 		}
 	}
-	info += mame.Machine("mslug3").GetStatusInfo()
-	info += mame.Machine("kov2p").GetStatusInfo()
-	info += mame.Machine("pgm").GetStatusInfo()
 
 	/*  ms, err := mame.Search("chess") */
 	// CheckError(err)
@@ -74,6 +74,8 @@ func main() {
 	// info += "</table>"
 	/* } */
 
+	info += `</div>`
+	info += htmlEnd
 	html, _ := os.OpenFile("info.html", os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	defer html.Close()
 	html.WriteString(info)
@@ -94,3 +96,22 @@ func CheckError(err error) {
 	}
 	log.Println(err)
 }
+
+var htmlHead = `<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="theme/css/bootstrap.min.css">
+  </head>
+  <body>
+  `
+var htmlEnd = `        <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
+    <script src="theme/js/jquery.slim.min.js"></script>
+    <script src="theme/js/popper.js"></script>
+    <script src="theme/js/bootstrap.min.js"></script>
+  </body>
+</html>`
