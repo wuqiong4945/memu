@@ -56,8 +56,8 @@ func main() {
 	// fmt.Println(info)
 	var info string
 	info += htmlHead
-	// info += `<div class="card-columns">`
-	info += `<div class="row">`
+	// info += `<div class="card-group">`
+	info += `<div class="card-columns">`
 	for _, machine := range mame.Machines {
 		if machine.MachineStatus&MACHINE_EXIST == MACHINE_EXIST {
 			info += machine.GetStatusInfo()

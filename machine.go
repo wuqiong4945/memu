@@ -46,14 +46,25 @@ func (machine Machine) GetStatusInfo() (info string) {
 		return ancesterMachineByDisk(*upperMachine, disk)
 	}
 
-	machineStatus := fmt.Sprintf("%b", machine.MachineStatus)
+	cardType := "card"
+	switch {
+	case machine.Isbios == "yes" ||
+		machine.Isdevice == "yes":
+		cardType += " card-warning"
+	case machine.MachineStatus&MACHINE_EXIST_V == MACHINE_EXIST_V:
+		cardType += " card-info"
+	default:
+		cardType += " card-danger"
+	}
+
 	info += "\n"
 	// info += `<div class="col-sm-3">`
-	info += `<div class="card w-25">`
+	info += `<div class="` + cardType + `">`
 	// info += `<div class="card">`
 	info += "\n"
 
 	// header
+	machineStatus := fmt.Sprintf("%b", machine.MachineStatus)
 	info += `	<div class="card-header">` + machine.Name + " (" + machineStatus + ")" + ``
 	info += `		<ul class="nav nav-tabs card-header-tabs" role="tablist">
       <li class="nav-item">

@@ -218,21 +218,25 @@ func (mame *Mame) UpdateAllMachineStatus() {
 		switch {
 		case machine.MachineStatus&MACHINE_EXIST != MACHINE_EXIST:
 			continue
-		case machine.Isbios || machine.Isdevice:
+		case machine.Isbios == "yes" || machine.Isdevice == "yes":
 			machine.UpdateStatus()
 		}
 	}
 	// second : deal with major machine
 	for k, _ := range mame.Machines {
 		machine := &mame.Machines[k]
-		if machine.Cloneof == "" && !machine.Isbios && !machine.Isdevice {
+		if machine.Cloneof == "" &&
+			machine.Isbios != "yes" &&
+			machine.Isdevice != "yes" {
 			machine.UpdateStatus()
 		}
 	}
 	// third : deal with clone machine
 	for k, _ := range mame.Machines {
 		machine := &mame.Machines[k]
-		if machine.Cloneof != "" && !machine.Isbios && !machine.Isdevice {
+		if machine.Cloneof != "" &&
+			machine.Isbios != "yes" &&
+			machine.Isdevice != "yes" {
 			machine.UpdateStatus()
 		}
 	}

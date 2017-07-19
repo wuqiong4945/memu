@@ -31,7 +31,7 @@ const (
 //	<!ATTLIST mame mameconfig CDATA #REQUIRED>
 type Mame struct {
 	Build      string `xml:"build,attr"`
-	Debug      bool   `xml:"debug,attr"`
+	Debug      string `xml:"debug,attr"`
 	Mameconfig string `xml:"mameconfig,attr"`
 
 	Machines []Machine `xml:"machine"`
@@ -53,10 +53,10 @@ type Mame struct {
 type Machine struct {
 	Name         string `xml:"name,attr"`
 	Sourcefile   string `xml:"sourcefile,attr"`
-	Isbios       bool   `xml:"isbios,attr"`
-	Isdevice     bool   `xml:"isdevice,attr"`
-	Ismechanical bool   `xml:"ismechanical,attr"`
-	Runnable     bool   `xml:"runnable,attr"`
+	Isbios       string `xml:"isbios,attr"`
+	Isdevice     string `xml:"isdevice,attr"`
+	Ismechanical string `xml:"ismechanical,attr"`
+	Runnable     string `xml:"runnable,attr"`
 	Cloneof      string `xml:"cloneof,attr"`
 	Romof        string `xml:"romof,attr"`
 	Sampleof     string `xml:"sampleof,attr"`
@@ -94,7 +94,7 @@ type Machine struct {
 type Biosset struct {
 	Name        string `xml:"name,attr"`
 	Description string `xml:"description,attr"`
-	Default     bool   `xml:"default,attr"`
+	Default     string `xml:"default,attr"`
 }
 
 //		<!ELEMENT rom EMPTY>
@@ -118,7 +118,7 @@ type Rom struct {
 	Region   string `xml:"region,attr"`
 	Offset   string `xml:"offset,attr"`
 	Status   string `xml:"status,attr"`
-	Optional bool   `xml:"optional,attr"`
+	Optional string `xml:"optional,attr"`
 
 	RomStatus RomStatus
 }
@@ -138,9 +138,9 @@ type Disk struct {
 	Merge    string `xml:"merge,attr"`
 	Region   string `xml:"region,attr"`
 	Index    string `xml:"index,attr"`
-	Writable bool   `xml:"writable,attr"`
+	Writable string `xml:"writable,attr"`
 	Status   string `xml:"status,attr"`
-	Optional bool   `xml:"optional,attr"`
+	Optional string `xml:"optional,attr"`
 
 	DiskStatus DiskStatus
 }
@@ -188,7 +188,7 @@ type Display struct {
 	Tag      string `xml:"tag,attr"`
 	Type     string `xml:"type,attr"`
 	Rotate   string `xml:"rotate,attr"`
-	Flipx    bool   `xml:"flipx,attr"`
+	Flipx    string `xml:"flipx,attr"`
 	Width    string `xml:"width,attr"`
 	Height   string `xml:"height,attr"`
 	Refresh  string `xml:"refresh,attr"`
@@ -214,8 +214,8 @@ type Sound struct {
 //			<!ATTLIST input buttons CDATA #IMPLIED>
 //			<!ATTLIST input coins CDATA #IMPLIED>
 type Input struct {
-	Service bool   `xml:"service,attr"`
-	Tilt    bool   `xml:"tilt,attr"`
+	Service string `xml:"service,attr"`
+	Tilt    string `xml:"tilt,attr"`
 	Players string `xml:"players,attr"`
 	Buttons string `xml:"buttons,attr"`
 	Coins   string `xml:"coins,attr"`
@@ -239,7 +239,7 @@ type Control struct {
 	Maximum     string `xml:"maximum,attr"`
 	Sensitivity string `xml:"sensitivity,attr"`
 	Keydelta    string `xml:"keydelta,attr"`
-	Reverse     bool   `xml:"reverse,attr"`
+	Reverse     string `xml:"reverse,attr"`
 	Ways        string `xml:"ways,attr"`
 	Ways2       string `xml:"ways2,attr"`
 	Ways3       string `xml:"ways3,attr"`
@@ -264,7 +264,7 @@ type Dipswitch struct {
 type Dipvalue struct {
 	Name    string `xml:"name,attr"`
 	Value   string `xml:"value,attr"`
-	Default bool   `xml:"default,attr"`
+	Default string `xml:"default,attr"`
 }
 
 //		<!ELEMENT configuration (confsetting*)>
@@ -286,7 +286,7 @@ type Configuration struct {
 type Confsetting struct {
 	Name    string `xml:"name,attr"`
 	Value   string `xml:"value,attr"`
-	Default bool   `xml:"default,attr"`
+	Default string `xml:"default,attr"`
 }
 
 //		<!ELEMENT port (analog*)>
@@ -308,7 +308,7 @@ type Analog struct {
 //			<!ATTLIST adjuster default CDATA #REQUIRED>
 type Adjuster struct {
 	Name    string `xml:"name,attr"`
-	Default bool   `xml:"default,attr"`
+	Default string `xml:"default,attr"`
 }
 
 //		<!ELEMENT driver EMPTY>
@@ -375,7 +375,7 @@ type Slot struct {
 type Slotoption struct {
 	Name    string `xml:"name,attr"`
 	Devname string `xml:"devname,attr"`
-	Default bool   `xml:"default,attr"`
+	Default string `xml:"default,attr"`
 }
 
 //		<!ELEMENT softwarelist EMPTY>
@@ -385,7 +385,7 @@ type Slotoption struct {
 type Softwarelist struct {
 	Name   string `xml:"name,attr"`
 	Status string `xml:"status,attr"`
-	Filter bool   `xml:"filter,attr"`
+	Filter string `xml:"filter,attr"`
 }
 
 //		<!ELEMENT ramoption (#PCDATA)>
