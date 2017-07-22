@@ -74,6 +74,9 @@ func (machine Machine) GetStatusInfo() (info string) {
         <a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_History" role="tab">History</a>
       </li>
       <li class="nav-item">
+        <a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_Command" role="tab">Command</a>
+      </li>
+      <li class="nav-item">
         <a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_None" role="tab">None</a>
       </li>
 		</ul>`
@@ -142,6 +145,11 @@ func (machine Machine) GetStatusInfo() (info string) {
 
 	info += `		<div class="tab-pane" id="` + machine.Name + `_History" role="tabpanel">`
 	info += machine.GetHistoryInfo()
+	info += `		</div>`
+	info += "\n"
+
+	info += `		<div class="tab-pane" id="` + machine.Name + `_Command" role="tabpanel">`
+	info += machine.GetCommandInfo()
 	info += `		</div>`
 	info += "\n"
 
@@ -268,33 +276,66 @@ func Convert(info, kind string) string {
 		rgxTable = []RegexpTable{
 			{`<br>\s+`, "<br>"},
 			// directions, generate duplicated symbols
-			{"_2_1_4_1_2_3_6", "<font color='blue'></font>"},
-			{"_2_3_6_3_2_1_4", "<font color='blue'></font>"},
-			{"_4_1_2_3_6", "<font color='blue'></font>"},
-			{"_6_3_2_1_4", "<font color='blue'></font>"},
-			{"_2_3_6", "<font color='blue'></font>"},
-			{"_2_1_4", "<font color='blue'></font>"},
-			{"_1", "<font color='green'></font>"},
-			{"_2", "<font color='green'></font>"},
-			{"_3", "<font color='green'></font>"},
-			{"_4", "<font color='green'></font>"},
+			// {"_2_1_4_1_2_3_6", "<img width='32' height='32' src='data/icons/bl.svg'/><img width='32' height='32' src='data/icons/lbr.svg'/>"},
+			// {"_2_3_6_3_2_1_4", "<img width='32' height='32' src='data/icons/br.svg'/><img width='32' height='32' src='data/icons/rbl.svg'/>"},
+
+			{"_4_1_2_3_6", "<img width='32' height='32' src='data/icons/lbr.svg'/>"},
+			{"_6_3_2_1_4", "<img width='32' height='32' src='data/icons/rbl.svg'/>"},
+			{"_6_3_2_3", "<img width='32' height='32' src='data/icons/rb.svg'/><img width='32' height='32' src='data/icons/br.svg'/>"}, // obscure
+			{"_4_1_2_1", "<img width='32' height='32' src='data/icons/lb.svg'/><img width='32' height='32' src='data/icons/bl.svg'/>"}, // obscure
+
+			{"_2_3_6", "<img width='32' height='32' src='data/icons/br.svg'/>"},
+			{"_6_3_2", "<img width='32' height='32' src='data/icons/rb.svg'/>"},
+			{"_2_1_4", "<img width='32' height='32' src='data/icons/bl.svg'/>"},
+			{"_4_1_2", "<img width='32' height='32' src='data/icons/lb.svg'/>"},
+
+			// partly command
+			{"_4_2_6", "<img width='32' height='32' src='data/icons/lbr.svg'/>"},
+			{"_6_2_4", "<img width='32' height='32' src='data/icons/rbl.svg'/>"},
+			{"_6_2_3", "<img width='32' height='32' src='data/icons/rb.svg'/><img width='32' height='32' src='data/icons/br.svg'/>"}, // obscure
+			{"_4_2_1", "<img width='32' height='32' src='data/icons/lb.svg'/><img width='32' height='32' src='data/icons/bl.svg'/>"}, // obscure
+
+			{"_1_2_3", "<img width='32' height='32' src='data/icons/bol.svg'/><img width='32' height='32' src='data/icons/b.svg'/><img width='32' height='32' src='data/icons/rob.svg'/>"},
+			{"_2_3", "<img width='32' height='32' src='data/icons/br.svg'/>"}, // obscure
+			{"_2_1", "<img width='32' height='32' src='data/icons/bl.svg'/>"}, // obscure
+
+			{"_2_8", "<img width='32' height='32' src='data/icons/bu.svg'/>"},
+			{"_8_2", "<img width='32' height='32' src='data/icons/ub.svg'/>"},
+			{"_6_4", "<img width='32' height='32' src='data/icons/rl.svg'/>"},
+			{"_4_6", "<img width='32' height='32' src='data/icons/lr.svg'/>"},
+			{"_6_6", "<img width='32' height='32' src='data/icons/rr.svg'/>"},
+			{"_4_4", "<img width='32' height='32' src='data/icons/ll.svg'/>"},
+			{"_2_2", "<img width='32' height='32' src='data/icons/bb.svg'/>"},
+			{"_8_8", "<img width='32' height='32' src='data/icons/uu.svg'/>"},
+
+			// partly command
+			{"_2_6", "<img width='32' height='32' src='data/icons/br.svg'/>"},
+			{"_6_2", "<img width='32' height='32' src='data/icons/rb.svg'/>"},
+			{"_2_4", "<img width='32' height='32' src='data/icons/bl.svg'/>"},
+			{"_4_2", "<img width='32' height='32' src='data/icons/lb.svg'/>"},
+
+			{"_1", "<img width='32' height='32' src='data/icons/bol.svg'/>"},
+			{"_2", "<img width='32' height='32' src='data/icons/b.svg'/>"},
+			{"_3", "<img width='32' height='32' src='data/icons/rob.svg'/>"},
+			{"_4", "<img width='32' height='32' src='data/icons/l.svg'/>"},
 			// {"_5",  " " },
-			{"_6", "<font color='green'></font>"},
-			{"_7", "<font color='green'></font>"},
-			{"_8", "<font color='green'></font>"},
-			{"_9", "<font color='green'></font>"},
+			{"_6", "<img width='32' height='32' src='data/icons/r.svg'/>"},
+			{"_7", "<img width='32' height='32' src='data/icons/lou.svg'/>"},
+			{"_8", "<img width='32' height='32' src='data/icons/u.svg'/>"},
+			{"_9", "<img width='32' height='32' src='data/icons/uor.svg'/>"},
 			{"_N", "<font color='green'><b>ℕ</b></font>"},
 			// {R"(_(\d))",          "dir-$1.png" },
 			// buttons
-			{"_A", "<font color='green'><b>Ⓐ</b></font>"},
-			{"_B", "<font color='green'><b>Ⓑ</b></font>"},
-			{"_C", "<font color='green'><b>Ⓒ</b></font>"},
-			{"_D", "<font color='green'><b>Ⓓ</b></font>"},
-			{"_E", "<font color='green'><b>Ⓔ</b></font>"},
-			{"_F", "<font color='green'><b>Ⓕ</b></font>"},
+			{"_A", "<font color='green'><kbd>A</kbd></font>"},
+			{"_B", "<font color='green'><kbd>B</kbd></font>"},
+			{"_C", "<font color='green'><kbd>C</kbd></font>"},
+			{"_D", "<font color='green'><kbd>D</kbd></font>"},
+			{"_E", "<font color='green'><kbd>E</kbd></font>"},
+			{"_F", "<font color='green'><kbd>F</kbd></font>"},
 			{"_\\+", "<font color='red'>✚</font>"},
-			{"_K", "<font color='green'><b>Ⓚ</b></font>"},
-			{"_P", "<font color='green'><b>Ⓟ</b></font>"},
+			{"_K", "<font color='green'><kbd>K</kbd></font>"},
+			{"_P", "<font color='green'><kbd>P</kbd></font>"},
+			{"_S", "<font color='green'><kbd>S</kbd></font>"},
 			// {`_([A-DGKNPS\+])`, "btn-$1.png" },
 			// {`_([a-f])`,         "btn-n$1.png" },
 			//  ------  ───
@@ -303,7 +344,7 @@ func Convert(info, kind string) string {
 			{`>\s*(\[[^\]<>]*\])`, "><font color='red'><b>$1</b></font>"},
 			{`(^\s*\[[^\]<>]*\])`, "<font color='red'><b>$1</b></font>"},
 			// special moves
-			{"★", "<font color='gold'>★</font>"},
+			{"★", "<font color='gold'><kbd>★</kbd></font>"},
 			{"☆", "<font color='silver'>☆</font>"},
 			{"●", "<font color='yellow'>●</font>"},
 			{"○", "<font color='orange'>○</font>"},
