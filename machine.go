@@ -282,7 +282,9 @@ func Convert(info, kind string) string {
 			{"_4_1_2_3_6", "<img width='32' height='32' src='data/icons/lbr.svg'/>"},
 			{"_6_3_2_1_4", "<img width='32' height='32' src='data/icons/rbl.svg'/>"},
 			{"_6_3_2_3", "<img width='32' height='32' src='data/icons/rb.svg'/><img width='32' height='32' src='data/icons/br.svg'/>"}, // obscure
+			{"_2_3_6_3", "<img width='32' height='32' src='data/icons/br.svg'/><img width='32' height='32' src='data/icons/rb.svg'/>"}, // obscure
 			{"_4_1_2_1", "<img width='32' height='32' src='data/icons/lb.svg'/><img width='32' height='32' src='data/icons/bl.svg'/>"}, // obscure
+			{"_2_1_4_1", "<img width='32' height='32' src='data/icons/bl.svg'/><img width='32' height='32' src='data/icons/lb.svg'/>"}, // obscure
 
 			{"_2_3_6", "<img width='32' height='32' src='data/icons/br.svg'/>"},
 			{"_6_3_2", "<img width='32' height='32' src='data/icons/rb.svg'/>"},
@@ -293,11 +295,15 @@ func Convert(info, kind string) string {
 			{"_4_2_6", "<img width='32' height='32' src='data/icons/lbr.svg'/>"},
 			{"_6_2_4", "<img width='32' height='32' src='data/icons/rbl.svg'/>"},
 			{"_6_2_3", "<img width='32' height='32' src='data/icons/rb.svg'/><img width='32' height='32' src='data/icons/br.svg'/>"}, // obscure
+			{"_2_6_3", "<img width='32' height='32' src='data/icons/br.svg'/><img width='32' height='32' src='data/icons/rb.svg'/>"}, // obscure
 			{"_4_2_1", "<img width='32' height='32' src='data/icons/lb.svg'/><img width='32' height='32' src='data/icons/bl.svg'/>"}, // obscure
+			{"_2_4_1", "<img width='32' height='32' src='data/icons/bl.svg'/><img width='32' height='32' src='data/icons/lb.svg'/>"}, // obscure
 
 			{"_1_2_3", "<img width='32' height='32' src='data/icons/bol.svg'/><img width='32' height='32' src='data/icons/b.svg'/><img width='32' height='32' src='data/icons/rob.svg'/>"},
 			{"_2_3", "<img width='32' height='32' src='data/icons/br.svg'/>"}, // obscure
+			{"_6_3", "<img width='32' height='32' src='data/icons/rb.svg'/>"}, // obscure
 			{"_2_1", "<img width='32' height='32' src='data/icons/bl.svg'/>"}, // obscure
+			{"_4_1", "<img width='32' height='32' src='data/icons/lb.svg'/>"}, // obscure
 
 			{"_2_8", "<img width='32' height='32' src='data/icons/bu.svg'/>"},
 			{"_8_2", "<img width='32' height='32' src='data/icons/ub.svg'/>"},
@@ -323,7 +329,7 @@ func Convert(info, kind string) string {
 			{"_7", "<img width='32' height='32' src='data/icons/lou.svg'/>"},
 			{"_8", "<img width='32' height='32' src='data/icons/u.svg'/>"},
 			{"_9", "<img width='32' height='32' src='data/icons/uor.svg'/>"},
-			{"_N", "<font color='green'><b>ℕ</b></font>"},
+			{"_N", "<img width='32' height='32' src='data/icons/n.svg'/>"},
 			// {R"(_(\d))",          "dir-$1.png" },
 			// buttons
 			{"_A", "<font color='green'><kbd>A</kbd></font>"},
