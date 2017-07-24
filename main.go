@@ -111,6 +111,7 @@ var htmlHead = `<!DOCTYPE html>
   `
 var htmlEnd = `        <!-- jQuery first, then Popper.js, then Bootstrap JS. -->
     <script src="theme/js/jquery.slim.min.js"></script>
+		<script src="theme/js/tether.min.js">_</script>
     <script src="theme/js/popper.js"></script>
     <script src="theme/js/bootstrap.min.js"></script>
   </body>

@@ -260,101 +260,95 @@ func Convert(info, kind string) string {
 	switch kind {
 	case "history":
 		rgxTable = []RegexpTable{
-			{`<br>\s+`, "<br>"},
+			{`<br>\s+`, `<br>`},
 			// - *** -
-			{`>\s*(-[^<>-]+-)\s*<`, "><font color='red'><b>$1</b></font><"},
+			{`>\s*(-[^<>-]+-)\s*<`, `><font color='red'><b>$1</b></font><`},
 		}
 
 	case "mameinfo":
 		rgxTable = []RegexpTable{
-			{`<br>\s+`, "<br>"},
+			{`<br>\s+`, `<br>`},
 			// [***]
-			{`>\s*([^<>:]+:)\s*<`, "><font color='red'><b>$1</b></font><"},
+			{`>\s*([^<>:]+:)\s*<`, `><font color='red'><b>$1</b></font><`},
 		}
 
 	case "command":
 		rgxTable = []RegexpTable{
-			{`<br>\s+`, "<br>"},
+			{`<br>\s+`, `<br>`},
 			// directions, generate duplicated symbols
-			// {"_2_1_4_1_2_3_6", "<img width='32' height='32' src='data/icons/bl.svg'/><img width='32' height='32' src='data/icons/lbr.svg'/>"},
-			// {"_2_3_6_3_2_1_4", "<img width='32' height='32' src='data/icons/br.svg'/><img width='32' height='32' src='data/icons/rbl.svg'/>"},
+			// {`_2_1_4_1_2_3_6`, `<img width='32' height='32' src='data/icons/bl.svg'/><img width='32' height='32' src='data/icons/lbr.svg'/>`},
+			// {`_2_3_6_3_2_1_4`, `<img width='32' height='32' src='data/icons/br.svg'/><img width='32' height='32' src='data/icons/rbl.svg'/>`},
 
-			{"_4_1_2_3_6", "<img width='32' height='32' src='data/icons/lbr.svg'/>"},
-			{"_6_3_2_1_4", "<img width='32' height='32' src='data/icons/rbl.svg'/>"},
-			{"_6_3_2_3", "<img width='32' height='32' src='data/icons/rb.svg'/><img width='32' height='32' src='data/icons/br.svg'/>"}, // obscure
-			{"_2_3_6_3", "<img width='32' height='32' src='data/icons/br.svg'/><img width='32' height='32' src='data/icons/rb.svg'/>"}, // obscure
-			{"_4_1_2_1", "<img width='32' height='32' src='data/icons/lb.svg'/><img width='32' height='32' src='data/icons/bl.svg'/>"}, // obscure
-			{"_2_1_4_1", "<img width='32' height='32' src='data/icons/bl.svg'/><img width='32' height='32' src='data/icons/lb.svg'/>"}, // obscure
+			{`_4_1_2_3_6`, `<img width='32' height='32' src='data/icons/41236.svg'/>`},
+			{`_6_3_2_1_4`, `<img width='32' height='32' src='data/icons/63214.svg'/>`},
+			{`_4_7_8_9_6`, `<img width='32' height='32' src='data/icons/47896.svg'/>`},
+			{`_6_9_8_7_4`, `<img width='32' height='32' src='data/icons/69874.svg'/>`},
+			{`_6_3_2_3`, `<img width='32' height='32' src='data/icons/632.svg'/><img width='32' height='32' src='data/icons/236.svg'/>`}, // obscure
+			{`_2_3_6_3`, `<img width='32' height='32' src='data/icons/236.svg'/><img width='32' height='32' src='data/icons/632.svg'/>`}, // obscure
+			{`_4_1_2_1`, `<img width='32' height='32' src='data/icons/412.svg'/><img width='32' height='32' src='data/icons/214.svg'/>`}, // obscure
+			{`_2_1_4_1`, `<img width='32' height='32' src='data/icons/214.svg'/><img width='32' height='32' src='data/icons/412.svg'/>`}, // obscure
 
-			{"_2_3_6", "<img width='32' height='32' src='data/icons/br.svg'/>"},
-			{"_6_3_2", "<img width='32' height='32' src='data/icons/rb.svg'/>"},
-			{"_2_1_4", "<img width='32' height='32' src='data/icons/bl.svg'/>"},
-			{"_4_1_2", "<img width='32' height='32' src='data/icons/lb.svg'/>"},
+			// for good looking
+			{`_6_4_6_4`, `<img width='32' height='32' src='data/icons/64.svg'/><img width='32' height='32' src='data/icons/64.svg'/>`},
+			{`_8_2_8_2`, `<img width='32' height='32' src='data/icons/82.svg'/><img width='32' height='32' src='data/icons/82.svg'/>`},
 
-			// partly command
-			{"_4_2_6", "<img width='32' height='32' src='data/icons/lbr.svg'/>"},
-			{"_6_2_4", "<img width='32' height='32' src='data/icons/rbl.svg'/>"},
-			{"_6_2_3", "<img width='32' height='32' src='data/icons/rb.svg'/><img width='32' height='32' src='data/icons/br.svg'/>"}, // obscure
-			{"_2_6_3", "<img width='32' height='32' src='data/icons/br.svg'/><img width='32' height='32' src='data/icons/rb.svg'/>"}, // obscure
-			{"_4_2_1", "<img width='32' height='32' src='data/icons/lb.svg'/><img width='32' height='32' src='data/icons/bl.svg'/>"}, // obscure
-			{"_2_4_1", "<img width='32' height='32' src='data/icons/bl.svg'/><img width='32' height='32' src='data/icons/lb.svg'/>"}, // obscure
+			{`_2_3_6`, `<img width='32' height='32' src='data/icons/236.svg'/>`},
+			{`_6_3_2`, `<img width='32' height='32' src='data/icons/632.svg'/>`},
+			{`_2_1_4`, `<img width='32' height='32' src='data/icons/214.svg'/>`},
+			{`_4_1_2`, `<img width='32' height='32' src='data/icons/412.svg'/>`},
 
-			{"_1_2_3", "<img width='32' height='32' src='data/icons/bol.svg'/><img width='32' height='32' src='data/icons/b.svg'/><img width='32' height='32' src='data/icons/rob.svg'/>"},
-			{"_2_3", "<img width='32' height='32' src='data/icons/br.svg'/>"}, // obscure
-			{"_6_3", "<img width='32' height='32' src='data/icons/rb.svg'/>"}, // obscure
-			{"_2_1", "<img width='32' height='32' src='data/icons/bl.svg'/>"}, // obscure
-			{"_4_1", "<img width='32' height='32' src='data/icons/lb.svg'/>"}, // obscure
-
-			{"_2_8", "<img width='32' height='32' src='data/icons/bu.svg'/>"},
-			{"_8_2", "<img width='32' height='32' src='data/icons/ub.svg'/>"},
-			{"_6_4", "<img width='32' height='32' src='data/icons/rl.svg'/>"},
-			{"_4_6", "<img width='32' height='32' src='data/icons/lr.svg'/>"},
-			{"_6_6", "<img width='32' height='32' src='data/icons/rr.svg'/>"},
-			{"_4_4", "<img width='32' height='32' src='data/icons/ll.svg'/>"},
-			{"_2_2", "<img width='32' height='32' src='data/icons/bb.svg'/>"},
-			{"_8_8", "<img width='32' height='32' src='data/icons/uu.svg'/>"},
+			{`_2_2_2`, `<img width='32' height='32' src='data/icons/222.svg'/>`},
+			{`_4_4_4`, `<img width='32' height='32' src='data/icons/444.svg'/>`},
+			{`_6_6_6`, `<img width='32' height='32' src='data/icons/666.svg'/>`},
+			{`_8_8_8`, `<img width='32' height='32' src='data/icons/888.svg'/>`},
 
 			// partly command
-			{"_2_6", "<img width='32' height='32' src='data/icons/br.svg'/>"},
-			{"_6_2", "<img width='32' height='32' src='data/icons/rb.svg'/>"},
-			{"_2_4", "<img width='32' height='32' src='data/icons/bl.svg'/>"},
-			{"_4_2", "<img width='32' height='32' src='data/icons/lb.svg'/>"},
+			{`_4_2_6`, `<img width='32' height='32' src='data/icons/41236.svg'/>`},
+			{`_6_2_4`, `<img width='32' height='32' src='data/icons/63214.svg'/>`},
+			{`_6_2_3`, `<img width='32' height='32' src='data/icons/632.svg'/><img width='32' height='32' src='data/icons/236.svg'/>`}, // obscure
+			{`_2_6_3`, `<img width='32' height='32' src='data/icons/236.svg'/><img width='32' height='32' src='data/icons/632.svg'/>`}, // obscure
+			{`_4_2_1`, `<img width='32' height='32' src='data/icons/412.svg'/><img width='32' height='32' src='data/icons/214.svg'/>`}, // obscure
+			{`_2_4_1`, `<img width='32' height='32' src='data/icons/214.svg'/><img width='32' height='32' src='data/icons/412.svg'/>`}, // obscure
 
-			{"_1", "<img width='32' height='32' src='data/icons/bol.svg'/>"},
-			{"_2", "<img width='32' height='32' src='data/icons/b.svg'/>"},
-			{"_3", "<img width='32' height='32' src='data/icons/rob.svg'/>"},
-			{"_4", "<img width='32' height='32' src='data/icons/l.svg'/>"},
-			// {"_5",  " " },
-			{"_6", "<img width='32' height='32' src='data/icons/r.svg'/>"},
-			{"_7", "<img width='32' height='32' src='data/icons/lou.svg'/>"},
-			{"_8", "<img width='32' height='32' src='data/icons/u.svg'/>"},
-			{"_9", "<img width='32' height='32' src='data/icons/uor.svg'/>"},
-			{"_N", "<img width='32' height='32' src='data/icons/n.svg'/>"},
-			// {R"(_(\d))",          "dir-$1.png" },
+			{`_1_2_3`, `<img width='32' height='32' src='data/icons/1.svg'/><img width='32' height='32' src='data/icons/2.svg'/><img width='32' height='32' src='data/icons/3.svg'/>`},
+			{`_4_6_6`, `<img width='32' height='32' src='data/icons/4.svg'/><img width='32' height='32' src='data/icons/66.svg'/>'/>`},
+
+			{`_2_3`, `<img width='32' height='32' src='data/icons/236.svg'/>`}, // obscure
+			{`_6_3`, `<img width='32' height='32' src='data/icons/632.svg'/>`}, // obscure
+			{`_2_1`, `<img width='32' height='32' src='data/icons/214.svg'/>`}, // obscure
+			{`_4_1`, `<img width='32' height='32' src='data/icons/412.svg'/>`}, // obscure
+
+			{`_2_2`, `<img width='32' height='32' src='data/icons/22.svg'/>`},
+			{`_4_4`, `<img width='32' height='32' src='data/icons/44.svg'/>`},
+			{`_6_6`, `<img width='32' height='32' src='data/icons/66.svg'/>`},
+			{`_8_8`, `<img width='32' height='32' src='data/icons/88.svg'/>`},
+
+			{`_4_6`, `<img width='32' height='32' src='data/icons/46.svg'/>`},
+			{`_6_4`, `<img width='32' height='32' src='data/icons/64.svg'/>`},
+			{`_2_8`, `<img width='32' height='32' src='data/icons/28.svg'/>`},
+			{`_8_2`, `<img width='32' height='32' src='data/icons/82.svg'/>`},
+
+			// partly command
+			{`_2_6`, `<img width='32' height='32' src='data/icons/236.svg'/>`},
+			{`_6_2`, `<img width='32' height='32' src='data/icons/632.svg'/>`},
+			{`_2_4`, `<img width='32' height='32' src='data/icons/214.svg'/>`},
+			{`_4_2`, `<img width='32' height='32' src='data/icons/412.svg'/>`},
+
+			{`_([1-9N])`, `<img width='32' height='32' src='data/icons/$1.svg'/>`},
 			// buttons
-			{"_A", "<font color='green'><kbd>A</kbd></font>"},
-			{"_B", "<font color='green'><kbd>B</kbd></font>"},
-			{"_C", "<font color='green'><kbd>C</kbd></font>"},
-			{"_D", "<font color='green'><kbd>D</kbd></font>"},
-			{"_E", "<font color='green'><kbd>E</kbd></font>"},
-			{"_F", "<font color='green'><kbd>F</kbd></font>"},
-			{"_\\+", "<font color='red'>✚</font>"},
-			{"_K", "<font color='green'><kbd>K</kbd></font>"},
-			{"_P", "<font color='green'><kbd>P</kbd></font>"},
-			{"_S", "<font color='green'><kbd>S</kbd></font>"},
-			// {`_([A-DGKNPS\+])`, "btn-$1.png" },
-			// {`_([a-f])`,         "btn-n$1.png" },
+			{`_([a-fA-DGKPS])`, `<font><kbd>$1</kbd></font>`},
+			{`_\+`, `<font color='red'>✚</font>`},
 			//  ------  ───
-			{`<br>[─]{8,}\s*<br>`, "<hr>"},
+			{`<br>[─]{8,}\s*<br>`, `<hr>`},
 			// [***]
-			{`>\s*(\[[^\]<>]*\])`, "><font color='red'><b>$1</b></font>"},
-			{`(^\s*\[[^\]<>]*\])`, "<font color='red'><b>$1</b></font>"},
+			{`>\s*(\[[^\]<>]*\])`, `><font color='red'><b>$1</b></font>`},
+			{`(^\s*\[[^\]<>]*\])`, `<font color='red'><b>$1</b></font>`},
 			// special moves
-			{"★", "<font color='gold'><kbd>★</kbd></font>"},
-			{"☆", "<font color='silver'>☆</font>"},
-			{"●", "<font color='yellow'>●</font>"},
-			{"○", "<font color='orange'>○</font>"},
-			{"◎", "<font color='red'>◎</font>"},
+			{`★`, `<font style='color:white;background-color:red'>★</font>`},
+			{`☆`, `<font style='color:white;background-color:silver'>☆</font>`},
+			{`●`, `<font style='color:white;background-color:yellwo'>●</font>`},
+			{`○`, `<font style='color:white;background-color:orange'>○</font>`},
+			{`◎`, `<font style='color:white;background-color:red'>◎</font>`},
 		}
 	default:
 	}
