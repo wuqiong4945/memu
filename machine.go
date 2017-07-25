@@ -24,28 +24,6 @@ func (machine Machine) Start() (result []byte) {
 }
 
 func (machine Machine) GetStatusInfo() (info string) {
-	var ancesterMachineByRom func(Machine, Rom) Machine
-	ancesterMachineByRom = func(machine Machine, rom Rom) Machine {
-		upperMachine := machine.UpperMachine()
-		if rom.Merge == "" ||
-			upperMachine == nil ||
-			upperMachine.Rom(rom.Crc) == nil {
-			return machine
-		}
-		return ancesterMachineByRom(*upperMachine, rom)
-	}
-
-	var ancesterMachineByDisk func(Machine, Disk) Machine
-	ancesterMachineByDisk = func(machine Machine, disk Disk) Machine {
-		upperMachine := machine.UpperMachine()
-		if disk.Merge == "" ||
-			upperMachine == nil ||
-			upperMachine.Disk(disk.Sha1) == nil {
-			return machine
-		}
-		return ancesterMachineByDisk(*upperMachine, disk)
-	}
-
 	cardType := "card"
 	switch {
 	case machine.Isbios == "yes" ||
@@ -67,19 +45,11 @@ func (machine Machine) GetStatusInfo() (info string) {
 	machineStatus := fmt.Sprintf("%b", machine.MachineStatus)
 	info += `	<div class="card-header">` + machine.Name + " (" + machineStatus + ")" + ``
 	info += `		<ul class="nav nav-tabs card-header-tabs" role="tablist">
-      <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_Roms" role="tab">Roms</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_History" role="tab">History</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_Command" role="tab">Command</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_None" role="tab">None</a>
-      </li>
-		</ul>`
+	<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_Roms" role="tab">Roms</a></li>
+	<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_History" role="tab">History</a></li>
+	<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_Command" role="tab">Command</a></li>
+	<li class="nav-item"><a class="nav-link" data-toggle="tab" href="#` + machine.Name + `_None" role="tab">None</a></li>
+	</ul>`
 	info += "\n"
 	info += `	</div>`
 	info += "\n"
@@ -102,8 +72,62 @@ func (machine Machine) GetStatusInfo() (info string) {
 	info += "\n"
 	// info += `<div class="card-block">`
 	info += `		<div class="tab-pane" id="` + machine.Name + `_Roms" role="tabpanel">`
+	info += machine.GetRomInfo()
+	info += `		</div>`
 	info += "\n"
-	// block
+
+	info += `		<div class="tab-pane" id="` + machine.Name + `_History" role="tabpanel">`
+	info += machine.GetHistoryInfo()
+	info += `		</div>`
+	info += "\n"
+
+	info += `		<div class="tab-pane" id="` + machine.Name + `_Command" role="tabpanel">`
+	info += machine.GetCommandInfo()
+	info += `		</div>`
+	info += "\n"
+
+	info += `		<div class="tab-pane" id="` + machine.Name + `_None" role="tabpanel">`
+	info += `		</div>`
+	info += "\n"
+
+	// info += `</div>` // block
+	info += `	</div>`
+	info += "\n"
+	// info += `	</div>`
+
+	// footer
+	info += `	<div class="card-footer text-muted text-right">` + machineStatus + `</div>`
+	info += "\n"
+
+	// info += `</div>`
+	info += `</div>`
+	info += "\n"
+	return
+}
+
+func (machine Machine) GetRomInfo() (info string) {
+	var ancesterMachineByRom func(Machine, Rom) Machine
+	ancesterMachineByRom = func(machine Machine, rom Rom) Machine {
+		upperMachine := machine.UpperMachine()
+		if rom.Merge == "" ||
+			upperMachine == nil ||
+			upperMachine.Rom(rom.Crc) == nil {
+			return machine
+		}
+		return ancesterMachineByRom(*upperMachine, rom)
+	}
+
+	var ancesterMachineByDisk func(Machine, Disk) Machine
+	ancesterMachineByDisk = func(machine Machine, disk Disk) Machine {
+		upperMachine := machine.UpperMachine()
+		if disk.Merge == "" ||
+			upperMachine == nil ||
+			upperMachine.Disk(disk.Sha1) == nil {
+			return machine
+		}
+		return ancesterMachineByDisk(*upperMachine, disk)
+	}
+
 	info += `			<table class="table table-striped table-sm">`
 	info += "\n"
 	for _, rom := range machine.Roms {
@@ -140,38 +164,8 @@ func (machine Machine) GetStatusInfo() (info string) {
 
 	info += `			</table>`
 	info += "\n"
-	info += `		</div>`
-	info += "\n"
-
-	info += `		<div class="tab-pane" id="` + machine.Name + `_History" role="tabpanel">`
-	info += machine.GetHistoryInfo()
-	info += `		</div>`
-	info += "\n"
-
-	info += `		<div class="tab-pane" id="` + machine.Name + `_Command" role="tabpanel">`
-	info += machine.GetCommandInfo()
-	info += `		</div>`
-	info += "\n"
-
-	info += `		<div class="tab-pane" id="` + machine.Name + `_None" role="tabpanel">`
-	info += `		</div>`
-	info += "\n"
-
-	// info += `</div>` // block
-	info += `	</div>`
-	info += "\n"
-	// info += `	</div>`
-
-	// footer
-	info += `	<div class="card-footer text-muted text-right">` + machineStatus + `</div>`
-	info += "\n"
-
-	// info += `</div>`
-	info += `</div>`
-	info += "\n"
 	return
 }
-
 func (machine Machine) GetHistoryInfo() (info string) {
 	kind := "history"
 	info = GetGeneralInfo(machine.Name, kind)
@@ -181,7 +175,56 @@ func (machine Machine) GetHistoryInfo() (info string) {
 }
 func (machine Machine) GetCommandInfo() (info string) {
 	kind := "command"
-	info = GetGeneralInfo(machine.Name, kind)
+	s := GetGeneralInfo(machine.Name, kind)
+
+	info += `		<div id="accordion" role="tablist" aria-multiselectable="true">`
+	info += "\n"
+	var id string
+	reader := bufio.NewReader(strings.NewReader(s))
+	k := 0
+	for {
+		lineBytes, _, err := reader.ReadLine()
+		if err == io.EOF {
+			break
+		}
+		line := string(lineBytes)
+
+		switch {
+		case line == "$cmd":
+			titleBytes, _, err := reader.ReadLine()
+			if err == io.EOF {
+				break
+			}
+			title := string(titleBytes)
+
+			id = fmt.Sprintf(machine.Name+"%d", k)
+			info += `<div class="panel panel-default">` +
+				`<div class="panel-heading" role="tab" id="heading_` + id + `">` +
+				`<h4 class="panel-title">` +
+				`<a data-toggle="collapse" data-parent="#accordion" href="#` + id + `" aria-expanded="true" aria-controls="` + id + `">` +
+				title +
+				`</a></h4></div>` +
+				`<div id="` + id + `" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_` + id + `">` +
+				`<p>`
+
+			k++
+			_, _, err = reader.ReadLine()
+			if err == io.EOF {
+				info += `</div></div>`
+				break
+			}
+
+		case line == "$end":
+			info += `</p></div></div>`
+
+		default:
+			// info += `<p>` + line + `</p>`
+			info += line
+			info += "\n"
+		}
+	}
+	info += `		</div>`
+
 	info = Convert(info, kind)
 
 	return
@@ -221,10 +264,13 @@ mainLoop:
 
 		case strings.HasPrefix(line, "$"):
 			if !strings.Contains(line, "=") {
+				if record == true {
+					buffer.WriteString(line + "\n")
+				}
 				continue
 			}
 			// reach another entry, stop recording
-			if record {
+			if record == true {
 				record = false
 				break mainLoop // finished
 			}
@@ -243,8 +289,7 @@ mainLoop:
 
 		default:
 			if record {
-				buffer.WriteString(line)
-				buffer.WriteString("<br>")
+				buffer.WriteString(line + "\n")
 			}
 		}
 
@@ -260,21 +305,24 @@ func Convert(info, kind string) string {
 	switch kind {
 	case "history":
 		rgxTable = []RegexpTable{
-			{`<br>\s+`, `<br>`},
 			// - *** -
 			{`>\s*(-[^<>-]+-)\s*<`, `><font color='red'><b>$1</b></font><`},
+
+			{`\s*\$\w+\s*\n`, ``},
+			{`\n`, `<br/>`},
 		}
 
 	case "mameinfo":
 		rgxTable = []RegexpTable{
-			{`<br>\s+`, `<br>`},
 			// [***]
 			{`>\s*([^<>:]+:)\s*<`, `><font color='red'><b>$1</b></font><`},
+
+			{`\s*\$\w+\s*\n`, ``},
+			{`\n`, `<br/>`},
 		}
 
 	case "command":
 		rgxTable = []RegexpTable{
-			{`<br>\s+`, `<br>`},
 			// directions, generate duplicated symbols
 			// {`_2_1_4_1_2_3_6`, `<img width='32' height='32' src='data/icons/bl.svg'/><img width='32' height='32' src='data/icons/lbr.svg'/>`},
 			// {`_2_3_6_3_2_1_4`, `<img width='32' height='32' src='data/icons/br.svg'/><img width='32' height='32' src='data/icons/rbl.svg'/>`},
@@ -349,6 +397,8 @@ func Convert(info, kind string) string {
 			{`●`, `<font style='color:white;background-color:yellwo'>●</font>`},
 			{`○`, `<font style='color:white;background-color:orange'>○</font>`},
 			{`◎`, `<font style='color:white;background-color:red'>◎</font>`},
+
+			// {`\n`, `<br/>`},
 		}
 	default:
 	}
