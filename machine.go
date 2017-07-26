@@ -25,15 +25,15 @@ func (machine Machine) Start() (result []byte) {
 
 func (machine Machine) GetStatusInfo() (info string) {
 	cardType := "card"
-	switch {
-	case machine.Isbios == "yes" ||
-		machine.Isdevice == "yes":
-		cardType += " card-warning"
-	case machine.MachineStatus&MACHINE_EXIST_V == MACHINE_EXIST_V:
-		cardType += " card-info"
-	default:
-		cardType += " card-danger"
-	}
+	// switch {
+	// case machine.Isbios == "yes" ||
+	// machine.Isdevice == "yes":
+	// cardType += " card-warning"
+	// case machine.MachineStatus&MACHINE_EXIST_V == MACHINE_EXIST_V:
+	// cardType += " card-info"
+	// default:
+	// cardType += " card-danger"
+	// }
 
 	info += "\n"
 	// info += `<div class="col-sm-3">`
@@ -68,9 +68,10 @@ func (machine Machine) GetStatusInfo() (info string) {
 	}
 	info += "\n"
 
+	// info += `<div class="card-block">`
 	info += `	<div class="tab-content">`
 	info += "\n"
-	// info += `<div class="card-block">`
+
 	info += `		<div class="tab-pane" id="` + machine.Name + `_Roms" role="tabpanel">`
 	info += machine.GetRomInfo()
 	info += `		</div>`
@@ -191,6 +192,7 @@ func (machine Machine) GetCommandInfo() (info string) {
 
 		switch {
 		case line == "$cmd":
+			k++
 			titleBytes, _, err := reader.ReadLine()
 			if err == io.EOF {
 				break
@@ -198,28 +200,55 @@ func (machine Machine) GetCommandInfo() (info string) {
 			title := string(titleBytes)
 
 			id = fmt.Sprintf(machine.Name+"%d", k)
-			info += `<div class="panel panel-default">` +
-				`<div class="panel-heading" role="tab" id="heading_` + id + `">` +
-				`<h4 class="panel-title">` +
-				`<a data-toggle="collapse" data-parent="#accordion" href="#` + id + `" aria-expanded="true" aria-controls="` + id + `">` +
-				title +
-				`</a></h4></div>` +
-				`<div id="` + id + `" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_` + id + `">` +
-				`<p>`
+			// info += `
+			// <div class="panel panel-default">
+			// <div class="panel-heading" role="tab" id="heading_` + id + `">
+			// <h6 class="panel-title">
+			// <a data-toggle="collapse" data-parent="#accordion" href="#` + id + `" aria-expanded="true" aria-controls="` + id + `">
+			// ` + title + `
+			// </a>
+			// </h6>
+			// </div>
+			// <div id="` + id + `" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_` + id + `">
+			// `
+			info += `
+				<div class="card">
+					<div class="card-header" role="tab" id="heading_` + id + `">
+						<h6 class="mb-0">
+							<a data-toggle="collapse" data-parent="#accordion" href="#` + id + `" aria-expanded="true" aria-controls="` + id + `">
+								` + title + `
+							</a>
+						</h6>
+					</div>
+					<div id="` + id + `" class="collapse" role="tabpanel" aria-labelledby="heading_` + id + `">
+						<div class="card-block">
+							<dl class="row">
+				`
 
-			k++
 			_, _, err = reader.ReadLine()
 			if err == io.EOF {
-				info += `</div></div>`
+				info += `</dl></div></div></div>`
 				break
 			}
 
 		case line == "$end":
-			info += `</p></div></div>`
+			info += `</dl>`
+			info += `</div></div></div>`
 
 		default:
 			// info += `<p>` + line + `</p>`
-			info += line
+			// info += line + "<br/>"
+			// line = strings.TrimSpace(line)
+			n := strings.Index(line, "     ")
+			// if strings.Contains(line, "     ") {
+			if n > 1 {
+				dt := strings.TrimSpace(line[0:n])
+				dd := strings.TrimSpace(line[n:len(line)])
+				info += `<dt class="col-sm-5"><small>` + dt + `</small></dt>` +
+					`<dd class="col-sm-7 text-right"><small>` + dd + `</small></dd>`
+			} else {
+				info += `<dt class="col-sm-12"><small>` + line + `</small></dt>`
+			}
 			info += "\n"
 		}
 	}
@@ -324,9 +353,6 @@ func Convert(info, kind string) string {
 	case "command":
 		rgxTable = []RegexpTable{
 			// directions, generate duplicated symbols
-			// {`_2_1_4_1_2_3_6`, `<img width='32' height='32' src='data/icons/bl.svg'/><img width='32' height='32' src='data/icons/lbr.svg'/>`},
-			// {`_2_3_6_3_2_1_4`, `<img width='32' height='32' src='data/icons/br.svg'/><img width='32' height='32' src='data/icons/rbl.svg'/>`},
-
 			{`_4_1_2_3_6`, `<img width='32' height='32' src='data/icons/41236.svg'/>`},
 			{`_6_3_2_1_4`, `<img width='32' height='32' src='data/icons/63214.svg'/>`},
 			{`_4_7_8_9_6`, `<img width='32' height='32' src='data/icons/47896.svg'/>`},
@@ -387,7 +413,7 @@ func Convert(info, kind string) string {
 			{`_([a-fA-DGKPS])`, `<font><kbd>$1</kbd></font>`},
 			{`_\+`, `<font color='red'>✚</font>`},
 			//  ------  ───
-			{`<br>[─]{8,}\s*<br>`, `<hr>`},
+			// {`<br>[─]{8,}\s*<br>`, `<hr>`},
 			// [***]
 			{`>\s*(\[[^\]<>]*\])`, `><font color='red'><b>$1</b></font>`},
 			{`(^\s*\[[^\]<>]*\])`, `<font color='red'><b>$1</b></font>`},
