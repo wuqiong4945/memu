@@ -25,15 +25,15 @@ func (machine Machine) Start() (result []byte) {
 
 func (machine Machine) GetStatusInfo() (info string) {
 	cardType := "card"
-	// switch {
-	// case machine.Isbios == "yes" ||
-	// machine.Isdevice == "yes":
-	// cardType += " card-warning"
-	// case machine.MachineStatus&MACHINE_EXIST_V == MACHINE_EXIST_V:
-	// cardType += " card-info"
-	// default:
-	// cardType += " card-danger"
-	// }
+	switch {
+	case machine.Isbios == "yes" ||
+		machine.Isdevice == "yes":
+		cardType += " card-warning"
+	case machine.MachineStatus&MACHINE_EXIST_V == MACHINE_EXIST_V:
+		cardType += " card-info"
+	default:
+		cardType += " card-danger"
+	}
 
 	info += "\n"
 	// info += `<div class="col-sm-3">`
@@ -140,6 +140,7 @@ func (machine Machine) GetRomInfo() (info string) {
 		info += "				<tr>" +
 			"<td>rom</td>" +
 			"<td>" + rom.Name + "</td>" +
+			"<td>" + rom.Crc + "</td>" +
 			"<td>" + fmt.Sprintf("%b", rom.RomStatus) + "</td>" +
 			"<td>" + rom.Status + "</td>" +
 			"<td>" + ancesterMachineName + "</td>" +
@@ -156,6 +157,8 @@ func (machine Machine) GetRomInfo() (info string) {
 		info += "				<tr>" +
 			"<td>disk</td>" +
 			"<td>" + disk.Name + "</td>" +
+			"<td> Sha1 </td>" +
+			// "<td>" + disk.Sha1 + "</td>" +
 			"<td>" + fmt.Sprintf("%b", disk.DiskStatus) + "</td>" +
 			"<td>" + disk.Status + "</td>" +
 			"<td>" + ancesterMachineName + "</td>" +
@@ -353,64 +356,64 @@ func Convert(info, kind string) string {
 	case "command":
 		rgxTable = []RegexpTable{
 			// directions, generate duplicated symbols
-			{`_4_1_2_3_6`, `<img width='32' height='32' src='data/icons/41236.svg'/>`},
-			{`_6_3_2_1_4`, `<img width='32' height='32' src='data/icons/63214.svg'/>`},
-			{`_4_7_8_9_6`, `<img width='32' height='32' src='data/icons/47896.svg'/>`},
-			{`_6_9_8_7_4`, `<img width='32' height='32' src='data/icons/69874.svg'/>`},
-			{`_6_3_2_3`, `<img width='32' height='32' src='data/icons/632.svg'/><img width='32' height='32' src='data/icons/236.svg'/>`}, // obscure
-			{`_2_3_6_3`, `<img width='32' height='32' src='data/icons/236.svg'/><img width='32' height='32' src='data/icons/632.svg'/>`}, // obscure
-			{`_4_1_2_1`, `<img width='32' height='32' src='data/icons/412.svg'/><img width='32' height='32' src='data/icons/214.svg'/>`}, // obscure
-			{`_2_1_4_1`, `<img width='32' height='32' src='data/icons/214.svg'/><img width='32' height='32' src='data/icons/412.svg'/>`}, // obscure
+			{`_4_1_2_3_6`, `<img width='32' height='32' src='data/icons/41236.svg.png'/>`},
+			{`_6_3_2_1_4`, `<img width='32' height='32' src='data/icons/63214.svg.png'/>`},
+			{`_4_7_8_9_6`, `<img width='32' height='32' src='data/icons/47896.svg.png'/>`},
+			{`_6_9_8_7_4`, `<img width='32' height='32' src='data/icons/69874.svg.png'/>`},
+			{`_6_3_2_3`, `<img width='32' height='32' src='data/icons/632.svg.png'/><img width='32' height='32' src='data/icons/236.svg.png'/>`}, // obscure
+			{`_2_3_6_3`, `<img width='32' height='32' src='data/icons/236.svg.png'/><img width='32' height='32' src='data/icons/632.svg.png'/>`}, // obscure
+			{`_4_1_2_1`, `<img width='32' height='32' src='data/icons/412.svg.png'/><img width='32' height='32' src='data/icons/214.svg.png'/>`}, // obscure
+			{`_2_1_4_1`, `<img width='32' height='32' src='data/icons/214.svg.png'/><img width='32' height='32' src='data/icons/412.svg.png'/>`}, // obscure
 
 			// for good looking
-			{`_6_4_6_4`, `<img width='32' height='32' src='data/icons/64.svg'/><img width='32' height='32' src='data/icons/64.svg'/>`},
-			{`_8_2_8_2`, `<img width='32' height='32' src='data/icons/82.svg'/><img width='32' height='32' src='data/icons/82.svg'/>`},
+			{`_6_4_6_4`, `<img width='64' height='32' src='data/icons/64.svg.png'/><img width='64' height='32' src='data/icons/64.svg.png'/>`},
+			{`_8_2_8_2`, `<img width='32' height='32' src='data/icons/82.svg.png'/><img width='32' height='32' src='data/icons/82.svg.png'/>`},
 
-			{`_2_3_6`, `<img width='32' height='32' src='data/icons/236.svg'/>`},
-			{`_6_3_2`, `<img width='32' height='32' src='data/icons/632.svg'/>`},
-			{`_2_1_4`, `<img width='32' height='32' src='data/icons/214.svg'/>`},
-			{`_4_1_2`, `<img width='32' height='32' src='data/icons/412.svg'/>`},
+			{`_2_3_6`, `<img width='32' height='32' src='data/icons/236.svg.png'/>`},
+			{`_6_3_2`, `<img width='32' height='32' src='data/icons/632.svg.png'/>`},
+			{`_2_1_4`, `<img width='32' height='32' src='data/icons/214.svg.png'/>`},
+			{`_4_1_2`, `<img width='32' height='32' src='data/icons/412.svg.png'/>`},
 
-			{`_2_2_2`, `<img width='32' height='32' src='data/icons/222.svg'/>`},
-			{`_4_4_4`, `<img width='32' height='32' src='data/icons/444.svg'/>`},
-			{`_6_6_6`, `<img width='32' height='32' src='data/icons/666.svg'/>`},
-			{`_8_8_8`, `<img width='32' height='32' src='data/icons/888.svg'/>`},
-
-			// partly command
-			{`_4_2_6`, `<img width='32' height='32' src='data/icons/41236.svg'/>`},
-			{`_6_2_4`, `<img width='32' height='32' src='data/icons/63214.svg'/>`},
-			{`_6_2_3`, `<img width='32' height='32' src='data/icons/632.svg'/><img width='32' height='32' src='data/icons/236.svg'/>`}, // obscure
-			{`_2_6_3`, `<img width='32' height='32' src='data/icons/236.svg'/><img width='32' height='32' src='data/icons/632.svg'/>`}, // obscure
-			{`_4_2_1`, `<img width='32' height='32' src='data/icons/412.svg'/><img width='32' height='32' src='data/icons/214.svg'/>`}, // obscure
-			{`_2_4_1`, `<img width='32' height='32' src='data/icons/214.svg'/><img width='32' height='32' src='data/icons/412.svg'/>`}, // obscure
-
-			{`_1_2_3`, `<img width='32' height='32' src='data/icons/1.svg'/><img width='32' height='32' src='data/icons/2.svg'/><img width='32' height='32' src='data/icons/3.svg'/>`},
-			{`_4_6_6`, `<img width='32' height='32' src='data/icons/4.svg'/><img width='32' height='32' src='data/icons/66.svg'/>'/>`},
-
-			{`_2_3`, `<img width='32' height='32' src='data/icons/236.svg'/>`}, // obscure
-			{`_6_3`, `<img width='32' height='32' src='data/icons/632.svg'/>`}, // obscure
-			{`_2_1`, `<img width='32' height='32' src='data/icons/214.svg'/>`}, // obscure
-			{`_4_1`, `<img width='32' height='32' src='data/icons/412.svg'/>`}, // obscure
-
-			{`_2_2`, `<img width='32' height='32' src='data/icons/22.svg'/>`},
-			{`_4_4`, `<img width='32' height='32' src='data/icons/44.svg'/>`},
-			{`_6_6`, `<img width='32' height='32' src='data/icons/66.svg'/>`},
-			{`_8_8`, `<img width='32' height='32' src='data/icons/88.svg'/>`},
-
-			{`_4_6`, `<img width='32' height='32' src='data/icons/46.svg'/>`},
-			{`_6_4`, `<img width='32' height='32' src='data/icons/64.svg'/>`},
-			{`_2_8`, `<img width='32' height='32' src='data/icons/28.svg'/>`},
-			{`_8_2`, `<img width='32' height='32' src='data/icons/82.svg'/>`},
+			{`_2_2_2`, `<img width='32' height='32' src='data/icons/222.svg.png'/>`},
+			{`_4_4_4`, `<img width='32' height='32' src='data/icons/444.svg.png'/>`},
+			{`_6_6_6`, `<img width='32' height='32' src='data/icons/666.svg.png'/>`},
+			{`_8_8_8`, `<img width='32' height='32' src='data/icons/888.svg.png'/>`},
 
 			// partly command
-			{`_2_6`, `<img width='32' height='32' src='data/icons/236.svg'/>`},
-			{`_6_2`, `<img width='32' height='32' src='data/icons/632.svg'/>`},
-			{`_2_4`, `<img width='32' height='32' src='data/icons/214.svg'/>`},
-			{`_4_2`, `<img width='32' height='32' src='data/icons/412.svg'/>`},
+			{`_4_2_6`, `<img width='32' height='32' src='data/icons/41236.svg.png'/>`},
+			{`_6_2_4`, `<img width='32' height='32' src='data/icons/63214.svg.png'/>`},
+			{`_6_2_3`, `<img width='32' height='32' src='data/icons/632.svg.png'/><img width='32' height='32' src='data/icons/236.svg.png'/>`}, // obscure
+			{`_2_6_3`, `<img width='32' height='32' src='data/icons/236.svg.png'/><img width='32' height='32' src='data/icons/632.svg.png'/>`}, // obscure
+			{`_4_2_1`, `<img width='32' height='32' src='data/icons/412.svg.png'/><img width='32' height='32' src='data/icons/214.svg.png'/>`}, // obscure
+			{`_2_4_1`, `<img width='32' height='32' src='data/icons/214.svg.png'/><img width='32' height='32' src='data/icons/412.svg.png'/>`}, // obscure
 
-			{`_([1-9N])`, `<img width='32' height='32' src='data/icons/$1.svg'/>`},
+			{`_1_2_3`, `<img width='32' height='32' src='data/icons/1.svg.png'/><img width='32' height='32' src='data/icons/2.svg.png'/><img width='32' height='32' src='data/icons/3.svg.png'/>`},
+			{`_4_6_6`, `<img width='32' height='32' src='data/icons/4.svg.png'/><img width='32' height='32' src='data/icons/66.svg.png'/>'/>`},
+
+			{`_2_3`, `<img width='32' height='32' src='data/icons/236.svg.png'/>`}, // obscure
+			{`_6_3`, `<img width='32' height='32' src='data/icons/632.svg.png'/>`}, // obscure
+			{`_2_1`, `<img width='32' height='32' src='data/icons/214.svg.png'/>`}, // obscure
+			{`_4_1`, `<img width='32' height='32' src='data/icons/412.svg.png'/>`}, // obscure
+
+			{`_2_2`, `<img width='32' height='32' src='data/icons/22.svg.png'/>`},
+			{`_4_4`, `<img width='32' height='32' src='data/icons/44.svg.png'/>`},
+			{`_6_6`, `<img width='32' height='32' src='data/icons/66.svg.png'/>`},
+			{`_8_8`, `<img width='32' height='32' src='data/icons/88.svg.png'/>`},
+
+			{`_4_6`, `<img width='64' height='32' src='data/icons/46.svg.png'/>`},
+			{`_6_4`, `<img width='64' height='32' src='data/icons/64.svg.png'/>`},
+			{`_2_8`, `<img width='32' height='32' src='data/icons/28.svg.png'/>`},
+			{`_8_2`, `<img width='32' height='32' src='data/icons/82.svg.png'/>`},
+
+			// partly command
+			{`_2_6`, `<img width='32' height='32' src='data/icons/236.svg.png'/>`},
+			{`_6_2`, `<img width='32' height='32' src='data/icons/632.svg.png'/>`},
+			{`_2_4`, `<img width='32' height='32' src='data/icons/214.svg.png'/>`},
+			{`_4_2`, `<img width='32' height='32' src='data/icons/412.svg.png'/>`},
+
+			{`_([1-9N])`, `<img width='32' height='32' src='data/icons/$1.svg.png'/>`},
 			// buttons
-			{`_([a-fA-DGKPS])`, `<font><kbd>$1</kbd></font>`},
+			{`_([a-zA-DGKPS])`, `<font><kbd>$1</kbd></font>`},
 			{`_\+`, `<font color='red'>✚</font>`},
 			//  ------  ───
 			// {`<br>[─]{8,}\s*<br>`, `<hr>`},
@@ -418,11 +421,11 @@ func Convert(info, kind string) string {
 			{`>\s*(\[[^\]<>]*\])`, `><font color='red'><b>$1</b></font>`},
 			{`(^\s*\[[^\]<>]*\])`, `<font color='red'><b>$1</b></font>`},
 			// special moves
-			{`★`, `<font style='color:white;background-color:red'>★</font>`},
-			{`☆`, `<font style='color:white;background-color:silver'>☆</font>`},
-			{`●`, `<font style='color:white;background-color:yellwo'>●</font>`},
-			{`○`, `<font style='color:white;background-color:orange'>○</font>`},
-			{`◎`, `<font style='color:white;background-color:red'>◎</font>`},
+			{`★`, `<mark>★</mark>`},
+			{`☆`, `<mark>☆</mark>`},
+			{`●`, `<mark>●</mark>`},
+			{`○`, `<mark>○</mark>`},
+			{`◎`, `<mark>◎</mark>`},
 
 			// {`\n`, `<br/>`},
 		}
