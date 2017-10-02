@@ -355,63 +355,66 @@ func Convert(info, kind string) string {
 
 	case "command":
 		rgxTable = []RegexpTable{
+			{`_6_3_2_1_4_1_2_3_6`, `<img width='32' height='32' src='data/icons/63214.svg'/><img width='32' height='32' src='data/icons/41236.svg'/>`},
+			{`_4_1_2_3_6_3_2_1_4`, `<img width='32' height='32' src='data/icons/41236.svg'/><img width='32' height='32' src='data/icons/63214.svg'/>`},
+
 			// directions, generate duplicated symbols
-			{`_4_1_2_3_6`, `<img width='32' height='32' src='data/icons/41236.svg.png'/>`},
-			{`_6_3_2_1_4`, `<img width='32' height='32' src='data/icons/63214.svg.png'/>`},
-			{`_4_7_8_9_6`, `<img width='32' height='32' src='data/icons/47896.svg.png'/>`},
-			{`_6_9_8_7_4`, `<img width='32' height='32' src='data/icons/69874.svg.png'/>`},
-			{`_6_3_2_3`, `<img width='32' height='32' src='data/icons/632.svg.png'/><img width='32' height='32' src='data/icons/236.svg.png'/>`}, // obscure
-			{`_2_3_6_3`, `<img width='32' height='32' src='data/icons/236.svg.png'/><img width='32' height='32' src='data/icons/632.svg.png'/>`}, // obscure
-			{`_4_1_2_1`, `<img width='32' height='32' src='data/icons/412.svg.png'/><img width='32' height='32' src='data/icons/214.svg.png'/>`}, // obscure
-			{`_2_1_4_1`, `<img width='32' height='32' src='data/icons/214.svg.png'/><img width='32' height='32' src='data/icons/412.svg.png'/>`}, // obscure
+			{`_4_1_2_3_6`, `<img width='32' height='32' src='data/icons/41236.svg'/>`},
+			{`_6_3_2_1_4`, `<img width='32' height='32' src='data/icons/63214.svg'/>`},
+			{`_4_7_8_9_6`, `<img width='32' height='32' src='data/icons/47896.svg'/>`},
+			{`_6_9_8_7_4`, `<img width='32' height='32' src='data/icons/69874.svg'/>`},
+			{`_6_3_2_3`, `<img width='32' height='32' src='data/icons/632.svg'/><img width='32' height='32' src='data/icons/236.svg'/>`}, // obscure
+			{`_2_3_6_3`, `<img width='32' height='32' src='data/icons/236.svg'/><img width='32' height='32' src='data/icons/632.svg'/>`}, // obscure
+			{`_4_1_2_1`, `<img width='32' height='32' src='data/icons/412.svg'/><img width='32' height='32' src='data/icons/214.svg'/>`}, // obscure
+			{`_2_1_4_1`, `<img width='32' height='32' src='data/icons/214.svg'/><img width='32' height='32' src='data/icons/412.svg'/>`}, // obscure
 
 			// for good looking
-			{`_6_4_6_4`, `<img width='64' height='32' src='data/icons/64.svg.png'/><img width='64' height='32' src='data/icons/64.svg.png'/>`},
-			{`_8_2_8_2`, `<img width='32' height='32' src='data/icons/82.svg.png'/><img width='32' height='32' src='data/icons/82.svg.png'/>`},
+			{`_6_4_6_4`, `<img width='32' height='32' src='data/icons/64.svg'/><img width='32' height='32' src='data/icons/64.svg'/>`},
+			{`_8_2_8_2`, `<img width='32' height='32' src='data/icons/82.svg'/><img width='32' height='32' src='data/icons/82.svg'/>`},
 
-			{`_2_3_6`, `<img width='32' height='32' src='data/icons/236.svg.png'/>`},
-			{`_6_3_2`, `<img width='32' height='32' src='data/icons/632.svg.png'/>`},
-			{`_2_1_4`, `<img width='32' height='32' src='data/icons/214.svg.png'/>`},
-			{`_4_1_2`, `<img width='32' height='32' src='data/icons/412.svg.png'/>`},
+			{`_2_3_6`, `<img width='32' height='32' src='data/icons/236.svg'/>`},
+			{`_6_3_2`, `<img width='32' height='32' src='data/icons/632.svg'/>`},
+			{`_2_1_4`, `<img width='32' height='32' src='data/icons/214.svg'/>`},
+			{`_4_1_2`, `<img width='32' height='32' src='data/icons/412.svg'/>`},
 
-			{`_2_2_2`, `<img width='32' height='32' src='data/icons/222.svg.png'/>`},
-			{`_4_4_4`, `<img width='32' height='32' src='data/icons/444.svg.png'/>`},
-			{`_6_6_6`, `<img width='32' height='32' src='data/icons/666.svg.png'/>`},
-			{`_8_8_8`, `<img width='32' height='32' src='data/icons/888.svg.png'/>`},
-
-			// partly command
-			{`_4_2_6`, `<img width='32' height='32' src='data/icons/41236.svg.png'/>`},
-			{`_6_2_4`, `<img width='32' height='32' src='data/icons/63214.svg.png'/>`},
-			{`_6_2_3`, `<img width='32' height='32' src='data/icons/632.svg.png'/><img width='32' height='32' src='data/icons/236.svg.png'/>`}, // obscure
-			{`_2_6_3`, `<img width='32' height='32' src='data/icons/236.svg.png'/><img width='32' height='32' src='data/icons/632.svg.png'/>`}, // obscure
-			{`_4_2_1`, `<img width='32' height='32' src='data/icons/412.svg.png'/><img width='32' height='32' src='data/icons/214.svg.png'/>`}, // obscure
-			{`_2_4_1`, `<img width='32' height='32' src='data/icons/214.svg.png'/><img width='32' height='32' src='data/icons/412.svg.png'/>`}, // obscure
-
-			{`_1_2_3`, `<img width='32' height='32' src='data/icons/1.svg.png'/><img width='32' height='32' src='data/icons/2.svg.png'/><img width='32' height='32' src='data/icons/3.svg.png'/>`},
-			{`_4_6_6`, `<img width='32' height='32' src='data/icons/4.svg.png'/><img width='32' height='32' src='data/icons/66.svg.png'/>'/>`},
-
-			{`_2_3`, `<img width='32' height='32' src='data/icons/236.svg.png'/>`}, // obscure
-			{`_6_3`, `<img width='32' height='32' src='data/icons/632.svg.png'/>`}, // obscure
-			{`_2_1`, `<img width='32' height='32' src='data/icons/214.svg.png'/>`}, // obscure
-			{`_4_1`, `<img width='32' height='32' src='data/icons/412.svg.png'/>`}, // obscure
-
-			{`_2_2`, `<img width='32' height='32' src='data/icons/22.svg.png'/>`},
-			{`_4_4`, `<img width='32' height='32' src='data/icons/44.svg.png'/>`},
-			{`_6_6`, `<img width='32' height='32' src='data/icons/66.svg.png'/>`},
-			{`_8_8`, `<img width='32' height='32' src='data/icons/88.svg.png'/>`},
-
-			{`_4_6`, `<img width='64' height='32' src='data/icons/46.svg.png'/>`},
-			{`_6_4`, `<img width='64' height='32' src='data/icons/64.svg.png'/>`},
-			{`_2_8`, `<img width='32' height='32' src='data/icons/28.svg.png'/>`},
-			{`_8_2`, `<img width='32' height='32' src='data/icons/82.svg.png'/>`},
+			{`_2_2_2`, `<img width='32' height='32' src='data/icons/222.svg'/>`},
+			{`_4_4_4`, `<img width='32' height='32' src='data/icons/444.svg'/>`},
+			{`_6_6_6`, `<img width='32' height='32' src='data/icons/666.svg'/>`},
+			{`_8_8_8`, `<img width='32' height='32' src='data/icons/888.svg'/>`},
 
 			// partly command
-			{`_2_6`, `<img width='32' height='32' src='data/icons/236.svg.png'/>`},
-			{`_6_2`, `<img width='32' height='32' src='data/icons/632.svg.png'/>`},
-			{`_2_4`, `<img width='32' height='32' src='data/icons/214.svg.png'/>`},
-			{`_4_2`, `<img width='32' height='32' src='data/icons/412.svg.png'/>`},
+			{`_4_2_6`, `<img width='32' height='32' src='data/icons/41236.svg'/>`},
+			{`_6_2_4`, `<img width='32' height='32' src='data/icons/63214.svg'/>`},
+			{`_6_2_3`, `<img width='32' height='32' src='data/icons/632.svg'/><img width='32' height='32' src='data/icons/236.svg'/>`}, // obscure
+			{`_2_6_3`, `<img width='32' height='32' src='data/icons/236.svg'/><img width='32' height='32' src='data/icons/632.svg'/>`}, // obscure
+			{`_4_2_1`, `<img width='32' height='32' src='data/icons/412.svg'/><img width='32' height='32' src='data/icons/214.svg'/>`}, // obscure
+			{`_2_4_1`, `<img width='32' height='32' src='data/icons/214.svg'/><img width='32' height='32' src='data/icons/412.svg'/>`}, // obscure
 
-			{`_([1-9N])`, `<img width='32' height='32' src='data/icons/$1.svg.png'/>`},
+			{`_1_2_3`, `<img width='32' height='32' src='data/icons/1.svg'/><img width='32' height='32' src='data/icons/2.svg'/><img width='32' height='32' src='data/icons/3.svg'/>`},
+			{`_4_6_6`, `<img width='32' height='32' src='data/icons/4.svg'/><img width='32' height='32' src='data/icons/66.svg'/>'/>`},
+
+			{`_2_3`, `<img width='32' height='32' src='data/icons/236.svg'/>`}, // obscure
+			{`_6_3`, `<img width='32' height='32' src='data/icons/632.svg'/>`}, // obscure
+			{`_2_1`, `<img width='32' height='32' src='data/icons/214.svg'/>`}, // obscure
+			{`_4_1`, `<img width='32' height='32' src='data/icons/412.svg'/>`}, // obscure
+
+			{`_2_2`, `<img width='32' height='32' src='data/icons/22.svg'/>`},
+			{`_4_4`, `<img width='32' height='32' src='data/icons/44.svg'/>`},
+			{`_6_6`, `<img width='32' height='32' src='data/icons/66.svg'/>`},
+			{`_8_8`, `<img width='32' height='32' src='data/icons/88.svg'/>`},
+
+			{`_4_6`, `<img width='32' height='32' src='data/icons/46.svg'/>`},
+			{`_6_4`, `<img width='32' height='32' src='data/icons/64.svg'/>`},
+			{`_2_8`, `<img width='32' height='32' src='data/icons/28.svg'/>`},
+			{`_8_2`, `<img width='32' height='32' src='data/icons/82.svg'/>`},
+
+			// partly command
+			{`_2_6`, `<img width='32' height='32' src='data/icons/236.svg'/>`},
+			{`_6_2`, `<img width='32' height='32' src='data/icons/632.svg'/>`},
+			{`_2_4`, `<img width='32' height='32' src='data/icons/214.svg'/>`},
+			{`_4_2`, `<img width='32' height='32' src='data/icons/412.svg'/>`},
+
+			{`_([1-9N])`, `<img width='32' height='32' src='data/icons/$1.svg'/>`},
 			// buttons
 			{`_([a-zA-DGKPS])`, `<font><kbd>$1</kbd></font>`},
 			{`_\+`, `<font color='red'>✚</font>`},
