@@ -37,6 +37,8 @@ func NewMame() (mame *Mame) {
 
 	return
 }
+
+// Audit roms
 func (mame *Mame) Audit() {
 	t := time.Now()
 	// defer fmt.Printf("Audit time: %s\n", time.Now().Sub(t).String())
@@ -91,6 +93,9 @@ func (mame *Mame) Audit() {
 	fmt.Printf("Audit time: %s\n", time.Now().Sub(t).String())
 	return
 }
+
+// Audit7zFile audit rom in 7z format
+// TODO: implement it
 func (mame *Mame) Audit7zFile(dir, fileName string) {
 	if !strings.HasSuffix(fileName, ".7z") {
 		return
@@ -106,6 +111,8 @@ func (mame *Mame) Audit7zFile(dir, fileName string) {
 		return
 	}
 }
+
+// AuditCHDFolder audit CHD rom
 func (mame *Mame) AuditCHDFolder(dir, folderName string) {
 	fmt.Println("\n--- " + folderName + " ---")
 	CHDMachineName := folderName
@@ -149,6 +156,7 @@ func (mame *Mame) AuditCHDFolder(dir, folderName string) {
 	}
 }
 
+// AuditZipFile audit rom in zip format
 func (mame *Mame) AuditZipFile(dir, fileName string) {
 	if !strings.HasSuffix(fileName, ".zip") {
 		return
