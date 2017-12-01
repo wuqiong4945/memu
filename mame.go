@@ -21,20 +21,21 @@ func NewMame() (mame *Mame) {
 	mame = new(Mame)
 
 	cacheFile, err := os.OpenFile("cache.gob", os.O_CREATE|os.O_RDWR, os.ModePerm)
+	defer cacheFile.Close()
 	CheckError(err)
 	if err != nil {
 		fmt.Printf("Error in open gob file : %s\n", err)
-		return
 	}
-	defer cacheFile.Close()
-
-	dec := gob.NewDecoder(cacheFile)
-	err = dec.Decode(mame)
-	CheckError(err)
-	if err != nil || mame.Build == "" {
-		fmt.Printf("Error in decoding gob : %s\n", err)
+	if err == nil {
+		dec := gob.NewDecoder(cacheFile)
+		err = dec.Decode(mame)
+		CheckError(err)
+		if err != nil || mame.Build == "" {
+			fmt.Printf("Error in decoding gob : %s\n", err)
+		}
 	}
 
+	mame.Update()
 	return
 }
 
@@ -226,12 +227,12 @@ func (mame *Mame) Fresh() {
 // Flush exports mame info to gob file
 func (mame Mame) Flush() {
 	cacheFile, err := os.OpenFile("cache.gob", os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
+	defer cacheFile.Close()
 	CheckError(err)
 	if err != nil {
 		fmt.Printf("Error in opening gob file : %s\n", err)
 		return
 	}
-	defer cacheFile.Close()
 
 	enc := gob.NewEncoder(cacheFile)
 	err = enc.Encode(mame)
@@ -268,44 +269,6 @@ func (mame *Mame) Update() {
 		mame.Fresh()
 		return
 	}
-
-	// f, err := os.Open("a.xml")
-	// CheckError(err)
-	// defer f.Close()
-
-	// reader := bufio.NewReader(f)
-	// var version string
-	// reg := regexp.MustCompile(`^\s*(\w+)\s*=\s*"([^\"]*)"\s+`)
-	// for {
-	// lineBytes, _, err := reader.ReadLine()
-	// line := strings.TrimSpace(string(lineBytes))
-	// if strings.HasPrefix(line, "<mame ") {
-	// line = strings.TrimPrefix(line, "<mame ")
-	// line = strings.TrimSuffix(line, ">") + " "
-
-	// for {
-	// attr := reg.FindString(line)
-	// if attr == "" {
-	// break
-	// }
-
-	// key := reg.ReplaceAllString(attr, `$1`)
-	// value := reg.ReplaceAllString(attr, `$2`)
-	// if key == "build" {
-	// version = value
-	// break
-	// }
-
-	// line = strings.TrimPrefix(line, attr)
-	// }
-
-	// break
-	// }
-
-	// if err == io.EOF {
-	// break
-	// }
-	// }
 
 	version := mame.Version()
 	l := len(mame.Build)
