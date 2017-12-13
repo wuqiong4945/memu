@@ -220,6 +220,25 @@ func (mame *Mame) Fresh() {
 	err = xml.Unmarshal(out, mame)
 	CheckError(err)
 
+	// delete repeat rom
+	for k, machine := range mame.Machines {
+		var roms []Rom
+		for _, rom := range machine.Roms {
+			isRepeatRom := false
+			for _, r := range roms {
+				if rom.Name == r.Name ||
+					rom.Crc == r.Crc {
+					isRepeatRom = true
+					break
+				}
+			}
+			if isRepeatRom == false {
+				roms = append(roms, rom)
+			}
+		}
+		mame.Machines[k].Roms = roms
+	}
+
 	isFlush = true
 	return
 }
