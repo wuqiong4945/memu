@@ -26,6 +26,11 @@ func (machine Machine) GetCommandInfo() (info string) {
 	kind := "command"
 	s := machine.GetGeneralInfo(kind)
 
+	machineName := machine.Name
+	if strings.Contains(machineName, "_") {
+		reg := regexp.MustCompile("_")
+		machineName = reg.ReplaceAllString(machineName, "-")
+	}
 	info += `		<div id="accordion" role="tablist" aria-multiselectable="true">`
 	info += "\n"
 	var id string
@@ -47,18 +52,7 @@ func (machine Machine) GetCommandInfo() (info string) {
 			}
 			title := string(titleBytes)
 
-			id = fmt.Sprintf(machine.Name+"%d", k)
-			// info += `
-			// <div class="panel panel-default">
-			// <div class="panel-heading" role="tab" id="heading_` + id + `">
-			// <h6 class="panel-title">
-			// <a data-toggle="collapse" data-parent="#accordion" href="#` + id + `" aria-expanded="true" aria-controls="` + id + `">
-			// ` + title + `
-			// </a>
-			// </h6>
-			// </div>
-			// <div id="` + id + `" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="heading_` + id + `">
-			// `
+			id = fmt.Sprintf(machineName+"%d", k)
 			info += `
 				<div class="card">
 					<div class="card-header" role="tab" id="heading_` + id + `">
@@ -84,11 +78,7 @@ func (machine Machine) GetCommandInfo() (info string) {
 			info += `</div></div></div>`
 
 		default:
-			// info += `<p>` + line + `</p>`
-			// info += line + "<br/>"
-			// line = strings.TrimSpace(line)
 			n := strings.Index(line, "     ")
-			// if strings.Contains(line, "     ") {
 			if n > 1 {
 				dt := strings.TrimSpace(line[0:n])
 				dd := strings.TrimSpace(line[n:len(line)])
@@ -103,13 +93,12 @@ func (machine Machine) GetCommandInfo() (info string) {
 	info += `		</div>`
 
 	info = Convert(info, kind)
-
 	return
 }
 
 func (machine Machine) GetGeneralInfo(kind string) (info string) {
 	machineName := machine.Name
-	path := cfg.Section("general").Key(kind).MustString(kind + ".dat")
+	path := cfg.Section("general").Key(kind).MustString("dats/" + kind + ".dat")
 	file, err := os.Open(path)
 	CheckError(err)
 	if err != nil {
@@ -119,6 +108,7 @@ func (machine Machine) GetGeneralInfo(kind string) (info string) {
 
 	var buffer bytes.Buffer
 	reader := bufio.NewReader(file)
+	isFound := false
 	record := false
 
 mainLoop:
@@ -152,6 +142,7 @@ mainLoop:
 				for _, key := range keys {
 					// found the entry, start recording
 					if key == machineName {
+						isFound = true
 						record = true
 						break
 					}
@@ -167,6 +158,9 @@ mainLoop:
 	}
 
 	info = buffer.String()
+	if isFound == false && machine.MainMachine() != nil {
+		info = machine.MainMachine().GetGeneralInfo(kind)
+	}
 	return
 }
 
@@ -249,6 +243,7 @@ func (machine Machine) GetRomInfo() (info string) {
 	info += "\n"
 	return
 }
+
 func (machine Machine) GetStatusInfo() (info string) {
 	cardType := "card"
 	switch {
@@ -332,6 +327,15 @@ func (machine Machine) GetStatusInfo() (info string) {
 	return
 }
 
+func (machine Machine) MainMachine() (mainMachine *Machine) {
+	if machine.Cloneof == "" {
+		return
+	}
+
+	mainMachine = mame.Machine(machine.Cloneof)
+	return
+}
+
 func (machine *Machine) Rom(crc string) (rom *Rom) {
 	for k, _ := range machine.Roms {
 		if machine.Roms[k].Crc == crc {
@@ -342,6 +346,7 @@ func (machine *Machine) Rom(crc string) (rom *Rom) {
 
 	return
 }
+
 func (machine Machine) Start() (result []byte) {
 	f, err := os.Open(mamePath)
 	CheckError(err)

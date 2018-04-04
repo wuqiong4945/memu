@@ -17,6 +17,10 @@ var isFlush = false
 var mame *Mame
 
 func main() {
+	if runtime.GOOS == "windows" {
+		mamePath = "mame/mame64.exe"
+	}
+
 	var err error
 	cfg, err = ini.Load(iniFileName)
 	if err != nil {
@@ -40,11 +44,10 @@ func main() {
 	mame = NewMame()
 	fmt.Printf("starting took amount of time: %s\n", time.Now().Sub(t).String())
 	mame.Update()
-	// mame.Audit()
+	mame.Audit()
 
 	fmt.Println("current mame version is : " + mame.Build)
 	fmt.Printf("%#v\n", mame.Debug)
-	// fmt.Println(mame.Machine("qsound"))
 
 	out := mame.VerifyRoms("pgm")
 	fmt.Println(string(out))
@@ -52,8 +55,6 @@ func main() {
 	// out = mame.Machine("sfa3").Start()
 	// fmt.Println(string(out))
 
-	// info := GetInfo("aoh", "history")
-	// fmt.Println(info)
 	var info string
 	info += htmlHead
 	// info += `<div class="card-group">`
@@ -64,24 +65,11 @@ func main() {
 		}
 	}
 
-	/*  ms, err := mame.Search("chess") */
-	// CheckError(err)
-	// if err == nil {
-	// info += "<table>"
-	// for _, m := range ms {
-	// info += "<tr><td>" + m.Name + "</td><td>" + m.Description + "</td><td>" + m.Year + "</td></tr>"
-	// }
-	// info += "</table>"
-	/* } */
-
 	info += `</div>`
 	info += htmlEnd
 	html, _ := os.OpenFile("info.html", os.O_CREATE|os.O_RDWR|os.O_TRUNC, os.ModePerm)
 	defer html.Close()
 	html.WriteString(info)
-
-	// out, _ = exec.Command(mamePath, "-lx").Output()
-	// html.WriteString(string(out))
 
 	fmt.Println(mame.Version())
 	if isFlush == true {
