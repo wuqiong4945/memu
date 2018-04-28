@@ -13,7 +13,7 @@ import (
 
 // Disk return disk by sha1 code
 func (machine *Machine) Disk(sha1 string) (disk *Disk) {
-	for k, _ := range machine.Disks {
+	for k := range machine.Disks {
 		if machine.Disks[k].Sha1 == sha1 {
 			disk = &machine.Disks[k]
 			return
@@ -31,6 +31,7 @@ func (machine Machine) GetCommandInfo() (info string) {
 		reg := regexp.MustCompile("_")
 		machineName = reg.ReplaceAllString(machineName, "-")
 	}
+
 	info += `		<div id="accordion" role="tablist" aria-multiselectable="true">`
 	info += "\n"
 	var id string
@@ -78,15 +79,16 @@ func (machine Machine) GetCommandInfo() (info string) {
 			info += `</div></div></div>`
 
 		default:
-			n := strings.Index(line, "     ")
-			if n > 1 {
-				dt := strings.TrimSpace(line[0:n])
-				dd := strings.TrimSpace(line[n:len(line)])
-				info += `<dt class="col-sm-5"><small>` + dt + `</small></dt>` +
-					`<dd class="col-sm-7 text-right"><small>` + dd + `</small></dd>`
-			} else {
-				info += `<dt class="col-sm-12"><small>` + line + `</small></dt>`
-			}
+			// n := strings.Index(line, "     ")
+			// if n > 1 {
+			// 	dt := strings.TrimSpace(line[0:n])
+			// 	dd := strings.TrimSpace(line[n:len(line)])
+			// 	info += `<dt class="col-sm-5"><small>` + dt + `</small></dt>` +
+			// 		`<dd class="col-sm-7 text-right"><small>` + dd + `</small></dd>`
+			// } else {
+			info += `<dt class="col-sm-12"><small>` + line + `</small></dt>`
+			// }
+			info += `<br/>`
 			info += "\n"
 		}
 	}
@@ -337,7 +339,7 @@ func (machine Machine) MainMachine() (mainMachine *Machine) {
 }
 
 func (machine *Machine) Rom(crc string) (rom *Rom) {
-	for k, _ := range machine.Roms {
+	for k := range machine.Roms {
 		if machine.Roms[k].Crc == crc {
 			rom = &machine.Roms[k]
 			return
@@ -448,9 +450,12 @@ func Convert(info, kind string) string {
 			{`_4_1_2_1`, `<img width='32' height='32' src='data/icons/412.svg'/><img width='32' height='32' src='data/icons/214.svg'/>`}, // obscure
 			{`_2_1_4_1`, `<img width='32' height='32' src='data/icons/214.svg'/><img width='32' height='32' src='data/icons/412.svg'/>`}, // obscure
 
+			{`_2_3_6_9`, `<img width='32' height='32' src='data/icons/23698.svg'/>`},
+			{`_2_1_4_7`, `<img width='32' height='32' src='data/icons/21478.svg'/>`},
+
 			// for good looking
-			{`_6_4_6_4`, `<img width='32' height='32' src='data/icons/64.svg'/><img width='32' height='32' src='data/icons/64.svg'/>`},
-			{`_8_2_8_2`, `<img width='32' height='32' src='data/icons/82.svg'/><img width='32' height='32' src='data/icons/82.svg'/>`},
+			// {`_6_4_6_4`, `<img width='32' height='32' src='data/icons/64.svg'/><img width='32' height='32' src='data/icons/64.svg'/>`},
+			// {`_8_2_8_2`, `<img width='32' height='32' src='data/icons/82.svg'/><img width='32' height='32' src='data/icons/82.svg'/>`},
 
 			{`_2_3_6`, `<img width='32' height='32' src='data/icons/236.svg'/>`},
 			{`_6_3_2`, `<img width='32' height='32' src='data/icons/632.svg'/>`},
@@ -483,10 +488,10 @@ func Convert(info, kind string) string {
 			{`_6_6`, `<img width='32' height='32' src='data/icons/66.svg'/>`},
 			{`_8_8`, `<img width='32' height='32' src='data/icons/88.svg'/>`},
 
-			{`_4_6`, `<img width='32' height='32' src='data/icons/46.svg'/>`},
-			{`_6_4`, `<img width='32' height='32' src='data/icons/64.svg'/>`},
-			{`_2_8`, `<img width='32' height='32' src='data/icons/28.svg'/>`},
-			{`_8_2`, `<img width='32' height='32' src='data/icons/82.svg'/>`},
+			// {`_4_6`, `<img width='32' height='32' src='data/icons/46.svg'/>`},
+			// {`_6_4`, `<img width='32' height='32' src='data/icons/64.svg'/>`},
+			// {`_2_8`, `<img width='32' height='32' src='data/icons/28.svg'/>`},
+			// {`_8_2`, `<img width='32' height='32' src='data/icons/82.svg'/>`},
 
 			// partly command
 			{`_2_6`, `<img width='32' height='32' src='data/icons/236.svg'/>`},

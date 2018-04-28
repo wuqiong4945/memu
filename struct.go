@@ -24,6 +24,7 @@ const (
 	DISK_EXIST_WN // valid but with wrong name
 )
 
+// Mame struct
 //<!DOCTYPE mame [
 //<!ELEMENT mame (machine+)>
 //	<!ATTLIST mame build CDATA #IMPLIED>
@@ -37,6 +38,7 @@ type Mame struct {
 	Machines []Machine `xml:"machine"`
 }
 
+// Machine struct
 //	<!ELEMENT machine (description, year?, manufacturer?, biosset*, rom*, disk*, device_ref*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, port*, adjuster*, driver?, device*, slot*, softwarelist*, ramoption*)>
 //		<!ATTLIST machine name CDATA #REQUIRED>
 //		<!ATTLIST machine sourcefile CDATA #IMPLIED>
@@ -87,6 +89,7 @@ type Machine struct {
 	MachineStatus MachineStatus
 }
 
+// Biosset struct
 //		<!ELEMENT biosset EMPTY>
 //			<!ATTLIST biosset name CDATA #REQUIRED>
 //			<!ATTLIST biosset description CDATA #REQUIRED>
@@ -97,6 +100,7 @@ type Biosset struct {
 	Default     string `xml:"default,attr"`
 }
 
+// Rom struct
 //		<!ELEMENT rom EMPTY>
 //			<!ATTLIST rom name CDATA #REQUIRED>
 //			<!ATTLIST rom bios CDATA #IMPLIED>
@@ -123,6 +127,7 @@ type Rom struct {
 	RomStatus RomStatus
 }
 
+// Disk struct
 //		<!ELEMENT disk EMPTY>
 //			<!ATTLIST disk name CDATA #REQUIRED>
 //			<!ATTLIST disk sha1 CDATA #IMPLIED>
@@ -145,18 +150,21 @@ type Disk struct {
 	DiskStatus DiskStatus
 }
 
+// Device_ref struct
 //		<!ELEMENT device_ref EMPTY>
 //			<!ATTLIST device_ref name CDATA #REQUIRED>
 type Device_ref struct {
 	Name string `xml:"name,attr"`
 }
 
+// Sample struct
 //		<!ELEMENT sample EMPTY>
 //			<!ATTLIST sample name CDATA #REQUIRED>
 type Sample struct {
 	Name string `xml:"name,attr"`
 }
 
+// Chip struct
 //		<!ELEMENT chip EMPTY>
 //			<!ATTLIST chip name CDATA #REQUIRED>
 //			<!ATTLIST chip tag CDATA #IMPLIED>
@@ -169,6 +177,7 @@ type Chip struct {
 	Clock string `xml:"clock,attr"`
 }
 
+// Display struct
 //		<!ELEMENT display EMPTY>
 //			<!ATTLIST display tag CDATA #IMPLIED>
 //			<!ATTLIST display type (raster|vector|lcd|unknown) #REQUIRED>
@@ -201,12 +210,14 @@ type Display struct {
 	Vbstart  string `xml:"vbstart,attr"`
 }
 
+// Sound struct
 //		<!ELEMENT sound EMPTY>
 //			<!ATTLIST sound channels CDATA #REQUIRED>
 type Sound struct {
 	Channels string `xml:"channels,attr"`
 }
 
+// Input struct
 //		<!ELEMENT input (control*)>
 //			<!ATTLIST input service (yes|no) "no">
 //			<!ATTLIST input tilt (yes|no) "no">
@@ -223,6 +234,7 @@ type Input struct {
 	Controls []Control `xml:"control"`
 }
 
+// Control struct
 //			<!ELEMENT control EMPTY>
 //				<!ATTLIST control type CDATA #REQUIRED>
 //				<!ATTLIST control minimum CDATA #IMPLIED>
@@ -245,6 +257,7 @@ type Control struct {
 	Ways3       string `xml:"ways3,attr"`
 }
 
+// Dipswitch struct
 //		<!ELEMENT dipswitch (dipvalue*)>
 //			<!ATTLIST dipswitch name CDATA #REQUIRED>
 //			<!ATTLIST dipswitch tag CDATA #REQUIRED>
@@ -257,6 +270,7 @@ type Dipswitch struct {
 	Dipvalues []Dipvalue `xml:"dipvalue"`
 }
 
+// Dipvalue struct
 //			<!ELEMENT dipvalue EMPTY>
 //				<!ATTLIST dipvalue name CDATA #REQUIRED>
 //				<!ATTLIST dipvalue value CDATA #REQUIRED>
@@ -267,6 +281,7 @@ type Dipvalue struct {
 	Default string `xml:"default,attr"`
 }
 
+// Configuration struct
 //		<!ELEMENT configuration (confsetting*)>
 //			<!ATTLIST configuration name CDATA #REQUIRED>
 //			<!ATTLIST configuration tag CDATA #REQUIRED>
@@ -279,6 +294,7 @@ type Configuration struct {
 	Confsettings []Confsetting `xml:"confsetting"`
 }
 
+// Confsetting struct
 //			<!ELEMENT confsetting EMPTY>
 //				<!ATTLIST confsetting name CDATA #REQUIRED>
 //				<!ATTLIST confsetting value CDATA #REQUIRED>
@@ -289,6 +305,7 @@ type Confsetting struct {
 	Default string `xml:"default,attr"`
 }
 
+// Port struct
 //		<!ELEMENT port (analog*)>
 //			<!ATTLIST port tag CDATA #REQUIRED>
 type Port struct {
@@ -297,12 +314,14 @@ type Port struct {
 	Analogs []Analog `xml:"analog"`
 }
 
+// Analog struct
 //			<!ELEMENT analog EMPTY>
 //				<!ATTLIST analog mask CDATA #REQUIRED>
 type Analog struct {
 	Mask string `xml:"mask,attr"`
 }
 
+// Adjuster struct
 //		<!ELEMENT adjuster EMPTY>
 //			<!ATTLIST adjuster name CDATA #REQUIRED>
 //			<!ATTLIST adjuster default CDATA #REQUIRED>
@@ -311,6 +330,7 @@ type Adjuster struct {
 	Default string `xml:"default,attr"`
 }
 
+// Driver struct
 //		<!ELEMENT driver EMPTY>
 //			<!ATTLIST driver status (good|imperfect|preliminary) #REQUIRED>
 //			<!ATTLIST driver emulation (good|imperfect|preliminary) #REQUIRED>
@@ -331,6 +351,7 @@ type Driver struct {
 	Savestate  string `xml:"savestate,attr"`
 }
 
+// Device struct
 //		<!ELEMENT device (instance*, extension*)>
 //			<!ATTLIST device type CDATA #REQUIRED>
 //			<!ATTLIST device tag CDATA #IMPLIED>
@@ -346,6 +367,7 @@ type Device struct {
 	Extensions []Extension `xml:"extension"`
 }
 
+// Instance struct
 //			<!ELEMENT instance EMPTY>
 //				<!ATTLIST instance name CDATA #REQUIRED>
 //				<!ATTLIST instance briefname CDATA #REQUIRED>
@@ -354,12 +376,14 @@ type Instance struct {
 	Briefname string `xml:"briefname,attr"`
 }
 
+// Extension struct
 //			<!ELEMENT extension EMPTY>
 //				<!ATTLIST extension name CDATA #REQUIRED>
 type Extension struct {
 	Name string `xml:"name,attr"`
 }
 
+// Slot struct
 //		<!ELEMENT slot (slotoption*)>
 //			<!ATTLIST slot name CDATA #REQUIRED>
 type Slot struct {
@@ -368,6 +392,7 @@ type Slot struct {
 	Slotoptions []Slotoption `xml:"slotoption"`
 }
 
+// Slotoption struct
 //			<!ELEMENT slotoption EMPTY>
 //				<!ATTLIST slotoption name CDATA #REQUIRED>
 //				<!ATTLIST slotoption devname CDATA #REQUIRED>
@@ -378,6 +403,7 @@ type Slotoption struct {
 	Default string `xml:"default,attr"`
 }
 
+// Softwarelist struct
 //		<!ELEMENT softwarelist EMPTY>
 //			<!ATTLIST softwarelist name CDATA #REQUIRED>
 //			<!ATTLIST softwarelist status (original|compatible) #REQUIRED>
@@ -388,6 +414,7 @@ type Softwarelist struct {
 	Filter string `xml:"filter,attr"`
 }
 
+// Ramoption struct
 //		<!ELEMENT ramoption (#PCDATA)>
 //			<!ATTLIST ramoption default CDATA #IMPLIED>
 type Ramoption struct {
